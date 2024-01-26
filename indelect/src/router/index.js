@@ -1,16 +1,27 @@
-/**
- * router/index.ts
- *
- * Automatic routes for `./src/pages/*.vue`
- */
-
-// Composables
-import { createRouter, createWebHistory } from 'vue-router/auto'
-import { setupLayouts } from 'virtual:generated-layouts'
-
+import { createRouter, createWebHistory } from 'vue-router'
+import HomeView from '../views/home.vue'
+import LoginVuie from '../views/Login.vue'
+import SignUp from '../views/Signup.vue'
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  extendRoutes: setupLayouts,
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/home',
+      name: 'home',
+      component: HomeView
+    },
+
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginVuie
+    },
+    {
+      path: '/signup',
+      name: 'SignUp',
+      component: SignUp
+    },
+  ]
 })
 
 export default router
