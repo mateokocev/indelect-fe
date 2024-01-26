@@ -1,15 +1,20 @@
-const axios = require('axios');
-const port = 3000;
-const dataServiceBaseUrl = `http://127.0.0.1:${port}`;
+/**
+ * main.js
+ *
+ * Bootstraps Vuetify and other plugins then mounts the App`
+ */
 
-import './assets/main.css'
+// Plugins
+import { registerPlugins } from '@/plugins'
 
-import { createApp } from 'vue'
+// Components
 import App from './App.vue'
-import router from './router'
+
+// Composables
+import { createApp } from 'vue'
 
 const app = createApp(App)
 
-app.use(router)
+registerPlugins(app)
 
 app.mount('#app')
