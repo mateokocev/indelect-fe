@@ -5,9 +5,9 @@
 
     <v-app-bar color="#B02E0C" flat height="72">
   <v-img
-    class="my-6"
+    class="my-6 ma-2"
     max-width="100"
-    :src="'https://cdn.discordapp.com/attachments/913519250872881233/1200473327085555783/Screenshot_2024-01-09_at_00.53.45.png?ex=65c64ee8&is=65b3d9e8&hm=282c381b6904fdde1699c2c0cf8a9e23e4115d4ec3c52025f994756f7deab363'"
+    :src="'https://cdn.discordapp.com/attachments/902618947759788043/1200528490102009916/Screenshot_2024-01-09_at_00.53.45.png?ex=65c68248&is=65b40d48&hm=280466fa6bd1c37b1348f82101dcaa76137a3cacc223c250846ecfa40a57210a&'"
   ></v-img>
 
   <v-btn>
