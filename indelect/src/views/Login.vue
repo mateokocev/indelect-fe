@@ -10,8 +10,7 @@ const visible = ref(false);
     <v-img
     class="mx-auto my-6"
     max-width="228"
-    :src="imageSrc"
-    alt="Image"
+    src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
   ></v-img>
 
     <v-card
@@ -88,12 +87,7 @@ const visible = ref(false);
   </div>
 </template>
 <script>
-export default {
-  data: () => ({
-    visible: false,
-  }),
-}
-const imageSrc = 'https://cdn.discordapp.com/attachments/913519250872881233/1200473327085555783/Screenshot_2024-01-09_at_00.53.45.png?ex=6606e868&is=65f47368&hm=701d92ee1c9abd1d8d0714d9c403dbc5dfe41d2e2b65';
+
 
 </script>
 

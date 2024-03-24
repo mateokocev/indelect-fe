@@ -3,11 +3,12 @@
 </script>
 
 <template>
-  <v-img
-    class="mx-auto"
-    max-width="228"
-    :src="'https://cdn.discordapp.com/attachments/913519250872881233/1200473327085555783/Screenshot_2024-01-09_at_00.53.45.png?ex=65c64ee8&is=65b3d9e8&hm=282c381b6904fdde1699c2c0cf8a9e23e4115d4ec3c52025f994756f7deab363'"
-  ></v-img>
+ <v-img
+  class="mx-auto"
+  max-width="228"
+  src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+></v-img>
+
   <div class="center-container">
     <v-card
       class="mx-auto"
@@ -102,7 +103,16 @@
             Legal
           </v-card-title>
           <v-card-text>
-            Nista jos kume
+            INDELECT Online Museum - Terms of Service
+
+Welcome to INDELECT Online Museum! By using our web app, you agree to the following terms:
+
+License to Use: You are granted a limited, non-exclusive license to access and use our services.
+User Accounts: You must create an account to access certain features and are responsible for maintaining its security.
+Content: You may contribute content, granting us the right to use it on the platform.
+Intellectual Property: All rights to the app's intellectual property belong to us; you cannot use our trademarks or copyrights without permission.
+Limitation of Liability: We are not liable for damages resulting from app use.
+Termination: We can terminate your access for violating these terms.
           </v-card-text>
           <v-divider></v-divider>
           <v-card-actions>

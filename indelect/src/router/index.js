@@ -2,8 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/home.vue'
 import LoginVuie from '../views/Login.vue'
 import SignUp from '../views/Signup.vue'
-import Explore from '../views/explore.vue'
+import Exibit from '../views/exibit.vue'
 import BuyTicket from '../views/BuyTicket.vue'
+import Explore from '../views/Explore.vue'
+import Map from '../views/Map.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -24,15 +27,26 @@ const router = createRouter({
       component: SignUp
     },
     {
-      path: '/explore',
-      name: 'Explore',
-      component: Explore
+      path: '/exibit',
+      name: 'Exibit',
+      component: Exibit
     },
     {
       path: '/buyticket',
       name: 'BuyTicket',
       component: BuyTicket
     },
+    {
+      path: '/explore',
+      name: 'Explore',
+      component: Explore
+    },
+    {
+      path: '/map',
+      name: 'Map',
+      component: Map
+    },
+
   ]
 })
 

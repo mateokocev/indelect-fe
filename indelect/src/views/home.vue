@@ -7,7 +7,7 @@
   <v-img
     class="my-6 ma-2"
     max-width="100"
-    :src="'https://cdn.discordapp.com/attachments/902618947759788043/1200528490102009916/Screenshot_2024-01-09_at_00.53.45.png?ex=65c68248&is=65b40d48&hm=280466fa6bd1c37b1348f82101dcaa76137a3cacc223c250846ecfa40a57210a&'"
+    src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
   ></v-img>
 
   <v-btn>
