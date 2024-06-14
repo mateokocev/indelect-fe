@@ -1,163 +1,228 @@
 <script setup>
+  import { RouterLink } from 'vue-router';
+  import { ref, onMounted } from 'vue';
 
+  const isMobile = ref(false);
+
+  onMounted(() => {
+    const updateIsMobile = () => {
+      isMobile.value = window.innerWidth <= 480;
+    };
+
+    updateIsMobile();
+    window.addEventListener('resize', updateIsMobile);
+
+    return () => {
+      window.removeEventListener('resize', updateIsMobile);
+    };
+  });
+
+  const email = ref('');
+  const password = ref('');
+  const username = ref('');
+  const visible = ref(false);
+
+  const rules = {
+    email: v => !!v.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) || 'Please enter a valid email',
+    length: len => v => (v || '').length >= len || `Invalid character length, required ${len}`,
+    password: v => !!v.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) || 'Password must contain an upper case letter, a numeric character, and a special character',
+    required: v => !!v || 'This field is required'
+  };
 </script>
 
 <template>
- <v-img
-  class="mx-auto"
-  max-width="228"
-  src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
-></v-img>
+  <div>
 
-  <div class="center-container">
-    <v-card
-      class="mx-auto"
-      style="max-width: 500px;"
-    >
-      <v-toolbar
-        color="#EB4511"
-        cards
-        dark
-        flat
+    <v-container v-if="!isMobile">
+      <v-img
+      class="mx-auto my-6"
+      max-width="228"
+      src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+      ></v-img>
+
+      <v-card
+        class="mx-auto pa-12 pb-8"
+        elevation="8"
+        max-width="448"
+        rounded="lg"
+        color="white" 
       >
-        <v-btn icon>
-          <v-icon>mdi-arrow-left</v-icon>
-        </v-btn>
-        <v-card-title class="text-h6 font-weight-regular">
-          Sign up
-        </v-card-title>
-        <v-spacer></v-spacer>
-        <v-btn icon>
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
-        <v-btn icon>
-          <v-icon>mdi-dots-vertical</v-icon>
-        </v-btn>
-      </v-toolbar>
-      <v-form
-        ref="form"
-        v-model="isValid"
-        class="pa-4 pt-6"
-      >
+        <div class="text-subtitle-1 text-medium-emphasis">Username</div>
+        <v-text-field
+          v-model="username"
+          :rules="[rules.required]"
+          density="compact"
+          placeholder="Enter your username"
+          prepend-inner-icon="mdi-account"
+          variant="outlined"
+        ></v-text-field>
+
+        <div class="text-subtitle-1 text-medium-emphasis">Email address</div>
         <v-text-field
           v-model="email"
-          :rules="[rules.email]"
-          variant="filled"
-          color="#B02E0C"
-          label="Email address"
-          type="email"
+          :rules="[rules.email,rules.required]"
+          density="compact"
+          placeholder="Enter your email address"
+          prepend-inner-icon="mdi-email-outline"
+          variant="outlined"
         ></v-text-field>
+
+        <div class="text-subtitle-1 text-medium-emphasis">Password</div>
         <v-text-field
           v-model="password"
-          :rules="[rules.password, rules.length(6)]"
-          variant="filled"
-          color="#EB4511"
-          counter="6"
-          label="Password"
-          style="min-height: 96px"
-          type="password"
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+          :type="visible ? 'text' : 'password'"
+          :rules="[rules.password, rules.length(6), rules.required]"
+          density="compact"
+          placeholder="Enter your password"
+          prepend-inner-icon="mdi-lock-outline"
+          variant="outlined"
+          @click:append-inner="visible = !visible"
+          class="mb-7"
         ></v-text-field>
-        <v-checkbox
-          v-model="agreement"
-          :rules="[rules.required]"
-          color="#B02E0C"
-        >
-          <template v-slot:label>
-            I agree to the&nbsp;
-            <a
-              href="#"
-              @click.stop.prevent="dialog = true"
-            >Terms of Service</a>
-            &nbsp;and&nbsp;
-            <a
-              href="#"
-              @click.stop.prevent="dialog = true"
-            >Privacy Policy</a>*
+
+
+
+        <router-link to="/" class="no-underline">
+          <v-btn
+            block
+            class="mb-8"
+            color="#EB4511"
+            size="large"
+            variant="tonal"
+            @click="register"
+          >
+          Sign Up
+          <template v-if="isLoading">
+            <v-progress-circular indeterminate color="#EB4511" size="24"></v-progress-circular>
           </template>
-        </v-checkbox>
-      </v-form>
-      <v-divider></v-divider>
-      <v-card-actions>
-        <v-btn
-          variant="text"
-          @click="form.reset()"
-        >
-          Clear
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-btn
-          :disabled="!isValid"
-          :loading="isLoading"
-          color="#8EB1C7"
-        >
-          Submit
-        </v-btn>
-      </v-card-actions>
-      <v-dialog
-        v-model="dialog"
-        max-width="400"
-        persistent
+          </v-btn>
+        </router-link>
+
+        <v-card-text class="text-center">
+          <router-link to="/" 
+            class="text-black text-decoration-underline" 
+          >
+          Already have an account? Log In
+          </router-link>
+        </v-card-text>
+      </v-card>
+    </v-container>
+
+    <v-container v-else>
+      <v-img
+      class="mx-auto my-6"
+      max-width="228"
+      src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+      ></v-img>
+
+      <v-card
+        class="mx-auto pa-12 pb-8"
+        max-width="448"
+        elevation="0"
+        rounded="lg"
+        color="white" 
       >
-        <v-card>
-          <v-card-title class="text-h5 bg-grey-lighten-3">
-            Legal
-          </v-card-title>
-          <v-card-text>
-            INDELECT Online Museum - Terms of Service
 
-Welcome to INDELECT Online Museum! By using our web app, you agree to the following terms:
+        <div class="text-subtitle-1 text-medium-emphasis">Username</div>
+        <v-text-field
+          v-model="username"
+          :rules="[rules.required]"
+          density="compact"
+          placeholder="Enter your username"
+          prepend-inner-icon="mdi-account"
+          variant="outlined"
+        ></v-text-field>
+      
+        <div class="text-subtitle-1 text-medium-emphasis">Email address</div>
+        <v-text-field
+            v-model="email"
+            :rules="[rules.email,rules.required]"
+            density="compact"
+            placeholder="Enter your email address"
+            prepend-inner-icon="mdi-email-outline"
+            variant="outlined"
+            class=""
+          ></v-text-field>
 
-License to Use: You are granted a limited, non-exclusive license to access and use our services.
-User Accounts: You must create an account to access certain features and are responsible for maintaining its security.
-Content: You may contribute content, granting us the right to use it on the platform.
-Intellectual Property: All rights to the app's intellectual property belong to us; you cannot use our trademarks or copyrights without permission.
-Limitation of Liability: We are not liable for damages resulting from app use.
-Termination: We can terminate your access for violating these terms.
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-btn
-              variant="text"
-              @click="agreement = false, dialog = false"
-            >
-              No
-            </v-btn>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="#8EB1C7"
-              variant="tonal"
-              @click="agreement = true, dialog = false"
-            >
-              Yes
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-card>
+        <div class="text-subtitle-1 text-medium-emphasis">Password</div>
+        <v-text-field
+          v-model="password"
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+          :type="visible ? 'text' : 'password'"
+          :rules="[rules.password, rules.length(6), rules.required]"
+          density="compact"
+          placeholder="Enter your password"
+          prepend-inner-icon="mdi-lock-outline"
+          variant="outlined"
+          @click:append-inner="visible = !visible"
+          class="mb-7"
+        ></v-text-field>
+
+        <router-link to="/" class="no-underline">
+          <v-btn
+            block
+            class="mb-6"
+            color="#EB4511"
+            size="large"
+            variant="tonal"
+            @click="register"
+          >
+          Sign Up
+          <template v-if="isLoading">
+            <v-progress-circular indeterminate color="#EB4511" size="24"></v-progress-circular>
+          </template>
+          </v-btn>
+        </router-link>
+
+        <v-card-text class="text-center">
+          <router-link to="/" 
+            class="text-black text-decoration-underline" 
+          >
+          Already have an account? Log In
+          </router-link>
+        </v-card-text>
+      </v-card>
+    </v-container>
+
   </div>
 </template>
 
 <script>
+  import axios from 'axios';
+  import bcrypt from 'bcryptjs';
+
   export default {
-    data: () => ({
-      agreement: false,
-      dialog: false,
-      email: undefined,
-      isValid: false,
-      isLoading: false,
-      password: undefined,
-      phone: undefined,
-      rules: {
-        email: v => !!(v || '').match(/@/) || 'Please enter a valid email',
-        length: len => v => (v || '').length >= len || `Invalid character length, required ${len}`,
-        password: v => !!(v || '').match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) ||
-          'Password must contain an upper case letter, a numeric character, and a special character',
-        required: v => !!v || 'This field is required',
-      },
-    }),
-  }
+    methods: {
+      async register() {
+        this.isLoading = true;
+        try {
+          const hashedPassword = await bcrypt.hash(this.password, 10);
+          const response = await axios.post('http://localhost:3030/register', {
+            username: this.username,
+            email: this.email,
+            password: hashedPassword
+          });
+          console.log('Registration successful:', response.data);
+        } catch (error) {
+          console.error('Registration failed:', error);
+        } finally {
+          this.isLoading = false;
+        }
+      }
+    }
+  };
 </script>
 
 <style scoped>
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
+.no-underline {
+  text-decoration: none;
+}
 </style>
