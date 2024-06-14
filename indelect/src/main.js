@@ -7,8 +7,7 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 import axios from 'axios'
-const port = 3030;
-const dataServiceBaseUrl = `htttp://127.0.0.1:${port}`;
+axios.defaults.baseURL = "http://localhost:3000/api";
 
 const app = createApp(App)
 

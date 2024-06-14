@@ -1,3 +1,35 @@
+<script setup>
+  import { RouterLink } from 'vue-router';
+  import { ref, onMounted } from 'vue';
+
+  const isMobile = ref(false);
+
+  onMounted(() => {
+    const updateIsMobile = () => {
+      isMobile.value = window.innerWidth <= 480;
+    };
+
+    updateIsMobile();
+    window.addEventListener('resize', updateIsMobile);
+
+    return () => {
+      window.removeEventListener('resize', updateIsMobile);
+    };
+  });
+
+  const email = ref('');
+  const password = ref('');
+  const username = ref('');
+  const visible = ref(false);
+
+  const rules = {
+    email: v => !!v.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) || 'Please enter a valid email',
+    length: len => v => (v || '').length >= len || `Invalid character length, required ${len}`,
+    password: v => !!v.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) || 'Password must contain an upper case letter, a numeric character, and a special character',
+    required: v => !!v || 'This field is required'
+  };
+</script>
+
 <template>
   <div>
 
@@ -157,85 +189,38 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
+  import axios from 'axios';
+  import bcrypt from 'bcryptjs';
 
-export default {
-  setup() {
-    const isMobile = ref(false);
-    const email = ref('');
-    const password = ref('');
-    const username = ref('');
-    const visible = ref(false);
-    const isLoading = ref(false);
+  export default {
 
-    onMounted(() => {
-      const updateIsMobile = () => {
-        isMobile.value = window.innerWidth <= 480;
+    data() {
+      return {
+        username: "",
+        email: "",
+        password: "",
       };
-
-      updateIsMobile();
-      window.addEventListener('resize', updateIsMobile);
-
-      return () => {
-        window.removeEventListener('resize', updateIsMobile);
-      };
-    });
-
-    const rules = {
-      email: v => !!v.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) || 'Please enter a valid email',
-      length: len => v => (v || '').length >= len || `Invalid character length, required ${len}`,
-      password: v => !!v.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) || 'Password must contain an upper case letter, a numeric character, and a special character',
-      required: v => !!v || 'This field is required'
-    };
-
-    const logPassword = () => {
-      console.log(password.value);
-    };
-
-    const hashPassword = async (password) => {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hash = await crypto.subtle.digest('SHA-256', data);
-      return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
-      logPassword();
-    };
-
-    const register = async () => {
-      if (!username.value || !email.value || !password.value) {
-        console.error('All fields are required');
-        return;
+    },
+    methods: {
+      async register() {
+        console.log(this.password);
+        this.isLoading = true;
+        try {
+          const hashedPassword = await bcrypt.hash(this.password, 10);
+          const response = await axios.post('/register', {
+            username: this.username,
+            email: this.email,
+            password: hashedPassword
+          });
+          console.log('Registration successful:', response.data);
+        } catch (error) {
+          console.error('Registration failed:', error);
+        } finally {
+          this.isLoading = false;
+        }
       }
-
-      isLoading.value = true;
-      try {
-        const hashedPassword = await hashPassword(password.value);
-        const response = await axios.post('/register', {
-          username: username.value,
-          email: email.value,
-          password: hashedPassword
-        });
-        console.log('Registration successful:', response.data);
-      } catch (error) {
-        console.error('Registration failed. Wompy Dompy:', error);
-      } finally {
-        isLoading.value = false;
-      }
-    };
-
-    return {
-      isMobile,
-      email,
-      password,
-      username,
-      visible,
-      isLoading,
-      rules,
-      logPassword,
-      register
-    };
-  }
-};
+    }
+  };
 </script>
 
 <style scoped>
