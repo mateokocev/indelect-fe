@@ -135,14 +135,18 @@
 import { RouterLink } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { usePiniaStorage } from '../store/index.js'
 
 export default {
+
   setup() {
     const isMobile = ref(false);
     const email = ref('');
     const password = ref('');
     const visible = ref(false);
     const isLoading = ref(false);
+
+    const piniaStorage = usePiniaStorage();
 
     onMounted(() => {
       const updateIsMobile = () => {
@@ -172,11 +176,13 @@ export default {
 
       isLoading.value = true;
       try {
-        const response = await axios.post('http://localhost:3030/login', {
+        const response = await axios.post('/login', {
           email: email.value,
           password: password.value
         });
         console.log('Login successful:', response.data);
+        console.log(response.data.isAdmin);
+        piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
         // Handle successful login
       } catch (error) {
         console.error('Login failed:', error);
