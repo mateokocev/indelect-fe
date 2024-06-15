@@ -6,6 +6,7 @@ import Exibit from '../views/Exibit.vue'
 import BuyTicket from '../views/BuyTicket.vue'
 import Explore from '../views/Explore.vue'
 import Map from '../views/Map.vue'
+import WrongDev from '../views/WrongDev.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,7 +16,11 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-
+    {
+      path: '/warning',
+      name: 'warning',
+      component: WrongDev
+    },
     {
       path: '/',
       name: 'login',

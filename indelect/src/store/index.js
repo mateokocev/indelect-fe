@@ -3,8 +3,8 @@ import { defineStore } from "pinia";
 export const usePiniaStorage = defineStore("piniaStorage", {
     state: () => ({ jwt: "", isAdmin: false }),
     getters: {
-        getToken: (state) => state.token,
-        getAdmin: (state) => state.isAdmin
+        getToken: (state) => { return state.token; },
+        getAdmin: (state) => { return state.isAdmin; }
     },
     actions: {
         setAuthData(token, isAdmin) {

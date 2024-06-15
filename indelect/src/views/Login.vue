@@ -1,11 +1,10 @@
 <template>
   <div>
     <v-container v-if="!isMobile">
-
       <v-img
-      class="mx-auto my-6"
-      max-width="228"
-      src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+        class="mx-auto my-6"
+        max-width="228"
+        src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
       ></v-img>
 
       <v-card
@@ -13,9 +12,8 @@
         elevation="8"
         max-width="448"
         rounded="lg"
-        color="white" 
+        color="white"
       >
-
         <div class="text-subtitle-1 text-medium-emphasis">Email address</div>
         <v-text-field
           v-model="email"
@@ -40,26 +38,48 @@
           class="mb-7"
         ></v-text-field>
 
+        <v-card
+          v-if="showError"
+          class="mx-auto pa-2 mb-14"
+          elevation="2"
+          max-width="400"
+          rounded="lg"
+          color="#e89c9c"
+        >
+          <v-card-text>
+            Log In failed. This is due to wrong credentials or failure in
+            authentication.
+          </v-card-text>
+        </v-card>
 
+        <v-card
+          v-if="showEmpty"
+          class="mx-auto pa-2 mb-12"
+          elevation="2"
+          max-width="400"
+          rounded="lg"
+          color="#e89c9c"
+        >
+          <v-card-text> Log In failed. Missing arguments. </v-card-text>
+        </v-card>
 
-        <router-link to="/home" class="no-underline">
-          <v-btn
-            block
-            class="mb-8"
-            color="#EB4511"
-            size="large"
-            variant="tonal"
-            @click="login"
-          >
+        <v-btn
+          block
+          class="mb-8"
+          color="#EB4511"
+          size="large"
+          variant="tonal"
+          @click="login"
+        >
           Log In
-          </v-btn>
-        </router-link>
+        </v-btn>
 
         <v-card-text class="text-center">
-          <router-link to="/signup"
+          <router-link
+            to="/signup"
             class="text-black text-decoration-underline"
           >
-          Don't have an account yet? Sign Up
+            Don't have an account yet? Sign Up
           </router-link>
         </v-card-text>
       </v-card>
@@ -67,9 +87,9 @@
 
     <v-container v-else>
       <v-img
-      class="mx-auto my-6"
-      max-width="228"
-      src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+        class="mx-auto my-6"
+        max-width="228"
+        src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
       ></v-img>
 
       <v-card
@@ -77,19 +97,18 @@
         max-width="448"
         elevation="0"
         rounded="lg"
-        color="white" 
+        color="white"
       >
-      
         <div class="text-subtitle-1 text-medium-emphasis">Email address</div>
         <v-text-field
-            v-model="email"
-            :rules="[rules.email,rules.required]"
-            density="compact"
-            placeholder="Enter your email address"
-            prepend-inner-icon="mdi-email-outline"
-            variant="outlined"
-            class=""
-          ></v-text-field>
+          v-model="email"
+          :rules="[rules.email, rules.required]"
+          density="compact"
+          placeholder="Enter your email address"
+          prepend-inner-icon="mdi-email-outline"
+          variant="outlined"
+          class=""
+        ></v-text-field>
 
         <div class="text-subtitle-1 text-medium-emphasis">Password</div>
         <v-text-field
@@ -105,48 +124,73 @@
           class="mb-7"
         ></v-text-field>
 
-        <router-link to="/home" class="no-underline">
-          <v-btn
-            block
-            class="mb-6"
-            color="#EB4511"
-            size="large"
-            variant="tonal"
-            @click="login"
-          >
+        <v-card
+          v-if="showError"
+          class="mx-auto pa-2 mb-12"
+          elevation="2"
+          max-width="400"
+          rounded="lg"
+          color="#e89c9c"
+        >
+          <v-card-text>
+            Log In failed. This is due to wrong credentials or failure in
+            authentication.
+          </v-card-text>
+        </v-card>
+
+        <v-card
+          v-if="showEmpty"
+          class="mx-auto pa-2 mb-12"
+          elevation="2"
+          max-width="400"
+          rounded="lg"
+          color="#e89c9c"
+        >
+          <v-card-text> Log In failed. Missing arguments. </v-card-text>
+        </v-card>
+
+        <v-btn
+          block
+          class="mb-6"
+          color="#EB4511"
+          size="large"
+          variant="tonal"
+          @click="login"
+        >
           Log In
-          </v-btn>
-        </router-link>
+        </v-btn>
 
         <v-card-text class="text-center">
-          <router-link to="/signup"
-            class="text-black text-decoration-underline" 
+          <router-link
+            to="/signup"
+            class="text-black text-decoration-underline"
           >
-          Don't have an account yet? Sign Up
+            Don't have an account yet? Sign Up
           </router-link>
         </v-card-text>
       </v-card>
     </v-container>
-
   </div>
 </template>
 
 <script>
-import { RouterLink } from 'vue-router';
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
-import { usePiniaStorage } from '../store/index.js'
+import { RouterLink, useRouter } from "vue-router";
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { usePiniaStorage } from "../store/index.js";
 
 export default {
-
   setup() {
     const isMobile = ref(false);
-    const email = ref('');
-    const password = ref('');
+    const email = ref("");
+    const password = ref("");
     const visible = ref(false);
     const isLoading = ref(false);
+    const showError = ref(false);
+    const showEmpty = ref(false);
 
     const piniaStorage = usePiniaStorage();
+    const router = useRouter();
 
     onMounted(() => {
       const updateIsMobile = () => {
@@ -154,39 +198,51 @@ export default {
       };
 
       updateIsMobile();
-      window.addEventListener('resize', updateIsMobile);
+      window.addEventListener("resize", updateIsMobile);
 
       return () => {
-        window.removeEventListener('resize', updateIsMobile);
+        window.removeEventListener("resize", updateIsMobile);
       };
     });
 
     const rules = {
-      email: v => !!v.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) || 'Please enter a valid email',
-      length: len => v => (v || '').length >= len || `Invalid character length, required ${len}`,
-      password: v => !!v.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) || 'Password must contain an upper case letter, a numeric character, and a special character',
-      required: v => !!v || 'This field is required'
+      email: (v) =>
+        !!v.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) ||
+        "Please enter a valid email",
+      length: (len) => (v) =>
+        (v || "").length >= len || `Invalid character length, required ${len}`,
+      password: (v) =>
+        !!v.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) ||
+        "Password must contain an upper case letter, a numeric character, and a special character",
+      required: (v) => !!v || "This field is required",
     };
 
     const login = async () => {
+      showError.value = false;
+      showEmpty.value = false;
+
       if (!email.value || !password.value) {
-        console.error('All fields are required');
+        console.error("All fields are required");
+        showEmpty.value = true;
         return;
       }
 
       isLoading.value = true;
+
       try {
-        const response = await axios.post('/login', {
+        const response = await axios.post("/login", {
           email: email.value,
-          password: password.value
+          password: password.value,
         });
-        console.log('Login successful:', response.data);
-        console.log(response.data.isAdmin);
+        console.log("Login successful:", response.data);
         piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
-        // Handle successful login
+
+        if(piniaStorage.getAdmin && isMobile.value) { router.push({ name: 'warning' }); }
+        else if(!piniaStorage.getAdmin && !isMobile.value){ router.push({ name: 'warning' }); }
+        
       } catch (error) {
-        console.error('Login failed:', error);
-        // Handle login error
+        console.error("Login failed:", error);
+        showError.value = true;
       } finally {
         isLoading.value = false;
       }
@@ -199,21 +255,23 @@ export default {
       visible,
       isLoading,
       rules,
-      login
+      login,
+      showError,
+      showEmpty,
     };
-  }
+  },
 };
 </script>
 
 <style scoped>
-  .center-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-  .no-underline {
-    text-decoration: none;
-  }
+.no-underline {
+  text-decoration: none;
+}
 </style>
