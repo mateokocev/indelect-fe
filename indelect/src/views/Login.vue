@@ -234,6 +234,8 @@ export default {
           email: email.value,
           password: password.value,
         });
+
+
         console.log("Login successful:", response.data);
         piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
 
