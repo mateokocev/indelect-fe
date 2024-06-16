@@ -7,6 +7,7 @@ import BuyTicket from '../views/BuyTicket.vue'
 import Explore from '../views/Explore.vue'
 import Map from '../views/Map.vue'
 import WrongDev from '../views/WrongDev.vue'
+import CMSHome from '../views/CMSHome.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +21,11 @@ const router = createRouter({
       path: '/warning',
       name: 'warning',
       component: WrongDev
+    },
+    {
+      path: '/cms/home',
+      name: 'cmshome',
+      component: CMSHome
     },
     {
       path: '/',
