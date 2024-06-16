@@ -1,64 +1,92 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/home.vue'
-import LoginVue from '../views/Login.vue'
-import SignUp from '../views/Signup.vue'
-import Exibit from '../views/Exibit.vue'
-import BuyTicket from '../views/BuyTicket.vue'
-import Explore from '../views/Explore.vue'
-import Map from '../views/Map.vue'
-import WrongDev from '../views/WrongDev.vue'
-import CMSHome from '../views/CMSHome.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import { usePiniaStorage } from "../store/index.js";
+
+import HomeView from "../views/home.vue";
+import LoginVue from "../views/Login.vue";
+import SignUp from "../views/Signup.vue";
+import Exibit from "../views/Exibit.vue";
+import BuyTicket from "../views/BuyTicket.vue";
+import Explore from "../views/Explore.vue";
+import Map from "../views/Map.vue";
+import WrongDev from "../views/WrongDev.vue";
+import CMSHome from "../views/CMSHome.vue";
+import NoAccessDev from "../views/NoAccessDev.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/home',
-      name: 'home',
-      component: HomeView
+      path: "/home",
+      name: "home",
+      component: HomeView,
     },
     {
-      path: '/warning',
-      name: 'warning',
-      component: WrongDev
+      path: "/warning",
+      name: "warning",
+      component: WrongDev,
+      meta: { requiresAuth: true}
     },
     {
-      path: '/cms/home',
-      name: 'cmshome',
-      component: CMSHome
+      path: "/cms/home",
+      name: "cmshome",
+      component: CMSHome,
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
-      path: '/',
-      name: 'login',
-      component: LoginVue
+      path: "/noaccess",
+      name: "noaccess",
+      component: NoAccessDev,
     },
     {
-      path: '/signup',
-      name: 'SignUp',
-      component: SignUp
+      path: "/",
+      name: "login",
+      component: LoginVue,
     },
     {
-      path: '/exibit',
-      name: 'Exibit',
-      component: Exibit
+      path: "/signup",
+      name: "SignUp",
+      component: SignUp,
     },
     {
-      path: '/buyticket',
-      name: 'BuyTicket',
-      component: BuyTicket
+      path: "/exibit",
+      name: "Exibit",
+      component: Exibit,
     },
     {
-      path: '/explore',
-      name: 'Explore',
-      component: Explore
+      path: "/buyticket",
+      name: "BuyTicket",
+      component: BuyTicket,
     },
     {
-      path: '/map',
-      name: 'Map',
-      component: Map
+      path: "/explore",
+      name: "Explore",
+      component: Explore,
     },
+    {
+      path: "/map",
+      name: "Map",
+      component: Map,
+    },
+  ],
+});
 
-  ]
-})
+router.beforeEach((to, from, next) => {
+  const piniaStorage = usePiniaStorage();
+  const isAuthenticated = !!piniaStorage.jwt;
+  const isAdmin = piniaStorage.isAdmin;
 
-export default router
+  if (to.path.startsWith("/cms/")) {
+    if (!isAuthenticated) {
+      next({ name: "noaccess" });
+    } 
+    else if (to.matched.some((record) => record.meta.requiresAdmin) && !isAdmin) {
+      next({ name: "noaccess" });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
+
+export default router;

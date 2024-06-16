@@ -238,7 +238,8 @@ export default {
         piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
 
         if(piniaStorage.getAdmin && isMobile.value) { router.push({ name: 'warning' }); }
-        else if(!piniaStorage.getAdmin && !isMobile.value){ router.push({ name: 'warning' }); }
+        else if(!piniaStorage.getAdmin && !isMobile.value) { router.push({ name: 'warning' }); }
+        else if(piniaStorage.getAdmin && !isMobile.value) { router.push({ name: 'cmshome' }); }
         
       } catch (error) {
         console.error("Login failed:", error);
