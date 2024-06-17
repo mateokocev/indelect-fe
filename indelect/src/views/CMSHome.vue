@@ -1,17 +1,59 @@
 <template>
-  <div>
-    <v-container v-if="!isMobile">
-        <v-app-bar
-            color="#EB4511"
-        >
+  <v-app>
+    <div>
+      <v-container v-if="!isMobile">
+        <v-app-bar color="#EB4511" dark>
+          <v-img
+            class="ml-4"
+            max-width="80"
+            rounded
+            flat
+            src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+          ></v-img>
 
+          <div class="vertical-separator"></div>
+
+          <v-text-field
+            class="search-bar mr-1"
+            v-model="search"
+            variant="solo-filled"
+            placeholder="Search exhibits..."
+            append-inner-icon="mdi-magnify"
+            density="compact"
+            bg-color="white"
+            rounded
+            flat
+            hide-details
+            @click:append="performSearch"
+          ></v-text-field>
+
+          <v-btn
+            @click="openFilter"
+            :ripple="false"
+            density="compact"
+            variant="plain"
+            icon
+          >
+            <v-icon>mdi-filter-variant</v-icon>
+          </v-btn>
+
+          <v-spacer></v-spacer>
+
+          <v-btn
+            @click="logout"
+            :ripple="false"
+            density="compact"
+            variant="plain"
+            icon
+          >
+            <v-icon>mdi-logout-variant</v-icon>
+          </v-btn>
         </v-app-bar>
-    </v-container>
+      </v-container>
 
-    <v-container v-else>
-        
-    </v-container>
-  </div>
+      <v-container v-else> </v-container>
+    </div>
+  </v-app>
 </template>
 
 <script>
@@ -55,4 +97,17 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.search-bar {
+  max-width: 300px;
+}
+
+.vertical-separator {
+  width: 1px;
+  height: 90%;
+  background-color: white;
+  margin-left: 16px;
+  margin-right: 16px;
+  border-radius: 5px;
+}
+</style>
