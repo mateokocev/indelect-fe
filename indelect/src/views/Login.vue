@@ -217,6 +217,13 @@ export default {
       required: (v) => !!v || "This field is required",
     };
 
+    const hashPassword = async (password) => {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+    };
+
     const login = async () => {
       showError.value = false;
       showEmpty.value = false;
@@ -230,11 +237,12 @@ export default {
       isLoading.value = true;
 
       try {
+        const hashedPassword = await hashPassword(password.value);
+
         const response = await axios.post("/login", {
           email: email.value,
-          password: password.value,
+          password: hashedPassword,
         });
-
 
         console.log("Login successful:", response.data);
         piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
