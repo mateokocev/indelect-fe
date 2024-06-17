@@ -234,7 +234,6 @@ export default {
       visible,
       isLoading,
       rules,
-      logPassword,
       register,
     };
   },
