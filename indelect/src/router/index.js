@@ -11,6 +11,12 @@ import Map from "../views/Map.vue";
 import WrongDev from "../views/WrongDev.vue";
 import CMSHome from "../views/CMSHome.vue";
 import NoAccessDev from "../views/NoAccessDev.vue";
+import NoAccessDev from "../views/TicketDetails.vue";
+import NoAccessDev from "../views/TicketList.vue";
+import NoAccessDev from "../views/Payment.vue";
+import NoAccessDev from "../views/Checkout.vue";
+
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -66,6 +72,26 @@ const router = createRouter({
       path: "/map",
       name: "Map",
       component: Map,
+    },
+    {
+      path: "/ticketdetails",
+      name: "ticketdetails",
+      component: TicketDetails,
+    },
+    {
+      path: "/ticketlist",
+      name: "ticketlist",
+      component: TicketList,
+    },
+    {
+      path: "/payment",
+      name: "payment",
+      component: Payment,
+    },
+    {
+      path: "/checkout",
+      name: "checkout",
+      component: Checkout,
     },
   ],
 });
