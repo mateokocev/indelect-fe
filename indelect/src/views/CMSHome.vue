@@ -27,15 +27,45 @@
             @click:append="performSearch"
           ></v-text-field>
 
-          <v-btn
-            @click="openFilter"
-            :ripple="false"
-            density="compact"
-            variant="plain"
-            icon
-          >
-            <v-icon>mdi-filter-variant</v-icon>
-          </v-btn>
+          <v-dialog max-width="300">
+            <template v-slot:activator="{ props: openFilterWindow }">
+              <v-btn
+                v-bind="openFilterWindow"
+                :ripple="false"
+                density="compact"
+                variant="plain"
+                icon
+              >
+                <v-icon>mdi-filter-variant</v-icon>
+              </v-btn>
+            </template>
+            <template v-slot:default="{ isActive }">
+              <v-card
+                class="pb-4"
+                rounded="lg"
+                color="white"
+              >
+                <v-card-title class="text-center">Filter</v-card-title>
+                <div class="horizontal-filter-title-separator"></div>
+
+                <v-checkbox
+                  class="ml-6 no-gap-checkbox"
+                  :ripple="false"
+                  label="Displayed exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
+
+                <v-checkbox
+                  class="ml-6 no-gap-checkbox"
+                  :ripple="false"
+                  label="Hidden exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
+              </v-card>
+            </template>
+          </v-dialog>
 
           <v-spacer></v-spacer>
 
@@ -109,5 +139,22 @@ export default {
   margin-left: 16px;
   margin-right: 16px;
   border-radius: 5px;
+}
+
+.horizontal-filter-title-separator {
+  height: 1px;
+  width: 90%;
+  align-self: center;
+  background-color: #EB4511;
+  margin-top: 6px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.no-gap-checkbox {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 </style>
