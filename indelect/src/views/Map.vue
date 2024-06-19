@@ -1,4 +1,9 @@
 <template>
+  <v-app>
+<div>
+<v-container v-if="!isMobile" ></v-container>
+<v-contain v-else>
+  <v-card>
   <div>
     <h1>Welcome to the Museum Map</h1>
     <div class="map-container">
@@ -19,30 +24,49 @@
       </div>
     </div>
   </div>
+</v-card>
+</v-contain>
+</div>
+  </v-app>
 </template>
 
 <script>
+import { RouterLink, useRouter } from "vue-router";
+import { ref, onMounted } from "vue";
+import { usePiniaStorage } from "../store/index.js";
+
 export default {
-  data() {
-    return {
-      hotspots: [
-        { id: 1, name: 'Spot 1', coordinates: { x: 200, y: -750 } },
-        { id: 2, name: 'Spot 2', coordinates: { x: 200, y: 300 } },
-        // Add more hotspots as needed
-      ],
-      selectedItem: null,
+  setup() {
+    const isMobile = ref(false);
+
+    const piniaStorage = usePiniaStorage();
+    const router = useRouter();
+
+    onMounted(() => {
+      const updateIsMobile = () => {
+        isMobile.value = window.innerWidth <= 480;
+        if (!isMobile.value) {
+          router.push({ name: "warning" });
+        }
+      };
+
+      updateIsMobile();
+      window.addEventListener("resize", updateIsMobile);
+
+      return () => {
+        window.removeEventListener("resize", updateIsMobile);
+      };
+    });
+
+    const logout = async () => {
+      await piniaStorage.clearAuthData();
+      router.push({ name: "login" });
     };
-  },
-  methods: {
-    showExhibition(itemId) {
-      // Simulate fetching item details from API based on itemId
-      // Replace this with actual API call in real application
-      this.selectedItem = this.hotspots.find(spot => spot.id === itemId);
-    },
-    handleMapClick(event) {
-      // Simulate clicking on map to deselect item
-      this.selectedItem = null;
-    },
+
+    return {
+      isMobile,
+      logout,
+    };
   },
 };
 </script>
