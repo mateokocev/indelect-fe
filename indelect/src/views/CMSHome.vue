@@ -40,16 +40,12 @@
               </v-btn>
             </template>
             <template v-slot:default="{ isActive }">
-              <v-card
-                class="pb-4"
-                rounded="lg"
-                color="white"
-              >
+              <v-card class="pb-4" rounded="lg" color="white">
                 <v-card-title class="text-center">Filter</v-card-title>
                 <div class="horizontal-filter-title-separator"></div>
 
                 <v-checkbox
-                  class="ml-6 no-gap-checkbox"
+                  class="ml-6 top-checkbox-top-margin"
                   :ripple="false"
                   label="Displayed exhibits"
                   color="#EB4511"
@@ -57,12 +53,36 @@
                 ></v-checkbox>
 
                 <v-checkbox
-                  class="ml-6 no-gap-checkbox"
+                  class="ml-6"
                   :ripple="false"
                   label="Hidden exhibits"
                   color="#EB4511"
                   density="compact"
                 ></v-checkbox>
+                <div class="horizontal-filter-title-separator"></div>
+
+                <v-toolbar
+                  color="white"
+                >
+                  
+                  <v-btn 
+                    color="primary" 
+                    @click=""
+                  >
+                    Apply
+                  </v-btn>
+
+                  <v-spacer></v-spacer>
+
+                  <v-card-actions>
+                    <v-btn 
+                      color="secondary" 
+                      @click="isActive.value = false"
+                    >
+                      Close
+                    </v-btn>
+                  </v-card-actions>
+                </v-toolbar>
               </v-card>
             </template>
           </v-dialog>
@@ -79,6 +99,53 @@
             <v-icon>mdi-logout-variant</v-icon>
           </v-btn>
         </v-app-bar>
+        
+        <v-container
+          class="mt-16 mb-5 mx-5"
+          min-height="500"
+        >
+          <v-row>
+            <v-col
+              class="d-flex align-center justify-center"
+              cols="5"
+              v-for="(exhibit, index) in exhibits"
+              :key="index"
+            >
+              <v-card
+                class="custom-card"
+                @click="viewExhibit(exhibit)"
+                rounded="10"
+                elevation="8"
+              >
+                <v-card-title>{{ exhibit.name }}</v-card-title>
+              </v-card>
+            </v-col>
+            <v-col
+              class="d-flex align-center justify-center"
+              cols="5"
+            >
+              <v-card
+                class="add-card"
+                @click="addNewExhibit"
+                color="#14baee"
+                height="200"
+              >
+                <v-card-text
+                  class="text-center add-card-top-margin"
+                >
+                  <v-icon
+                    :size="64"
+                    color="white"
+                  >
+                    mdi-plus
+                  </v-icon>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+
+
       </v-container>
 
       <v-container v-else> </v-container>
@@ -94,6 +161,9 @@ import { usePiniaStorage } from "../store/index.js";
 export default {
   setup() {
     const isMobile = ref(false);
+    const displayedExhibits = ref(false);
+    const hiddenExhibits = ref(false);
+    const exhibits = ref([]);
 
     const piniaStorage = usePiniaStorage();
     const router = useRouter();
@@ -122,6 +192,9 @@ export default {
     return {
       isMobile,
       logout,
+      displayedExhibits,
+      hiddenExhibits,
+      exhibits
     };
   },
 };
@@ -145,16 +218,25 @@ export default {
   height: 1px;
   width: 90%;
   align-self: center;
-  background-color: #EB4511;
+  background-color: #eb4511;
   margin-top: 6px;
   margin-bottom: 10px;
   border-radius: 5px;
 }
 
-.no-gap-checkbox {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+.top-checkbox-top-margin {
+  margin-top: 22px;
+}
+
+.custom-card {
+  height: 100%;
+}
+
+.add-card-top-margin {
+  margin-top: 52px;
+}
+
+.custom-add-icon-size {
+
 }
 </style>
