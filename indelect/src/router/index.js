@@ -11,10 +11,10 @@ import Map from "../views/Map.vue";
 import WrongDev from "../views/WrongDev.vue";
 import CMSHome from "../views/CMSHome.vue";
 import NoAccessDev from "../views/NoAccessDev.vue";
-import NoAccessDev from "../views/TicketDetails.vue";
-import NoAccessDev from "../views/TicketList.vue";
-import NoAccessDev from "../views/Payment.vue";
-import NoAccessDev from "../views/Checkout.vue";
+import TicketDetails from "../views/TicketDetails.vue";
+import TicketList from "../views/TicketList.vue";
+import Payment from "../views/Payment.vue";
+import Checkout from "../views/Checkout.vue";
 
 
 
