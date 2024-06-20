@@ -158,11 +158,13 @@
                       v-model="newImages"
                       label="Exhibit images..."
                       :rules="[rules.required]"
+                      @change="convertToBase64"
                       variant="underlined"
                       clearable
                       chips
                       multiple
                     ></v-file-input>
+                    <v-btn @click="convertToBase64"> haha gae </v-btn>
 
                     <v-checkbox
                       v-model="newDisplayed"
@@ -173,15 +175,18 @@
                       density="compact"
                     ></v-checkbox>
 
-                    <v-toolbar
-                      class="mt-6"
-                      color="white"
-                    >
+                    <v-toolbar class="mt-6" color="white">
                       <v-card-actions>
                         <v-btn
                           class="ml-16"
                           color="primary"
-                          @click="()=>{{isActive.value = false}}"
+                          @click="
+                            () => {
+                              {
+                                isActive.value = false;
+                              }
+                            }
+                          "
                         >
                           Add New
                         </v-btn>
@@ -227,6 +232,7 @@ export default {
     const newDescription = ref("");
     const newImages = ref([]);
     const newDisplayed = ref(false);
+    const base64Array = ref([]);
 
     const piniaStorage = usePiniaStorage();
     const router = useRouter();
@@ -256,15 +262,40 @@ export default {
       router.push({ name: "login" });
     };
 
-    const newExhibit = async () => {
+    const convertToBase64 = async (newImages) => {
+      const base64Array = [];
+      console.log(newImages);
 
-      if (!newTitle.value || !newDescription.value || !newImages.value || !newDisplayed.value) {
+      const fileArray = Array.from(newImages);
+      for (const file of fileArray) {
+        base64Array.push(await fileToBase64(file));
+      }
+
+      console.log(base64Array.value);
+      return base64Array;
+    };
+
+    const fileToBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(file);
+      });
+    };
+
+    const newExhibit = async () => {
+      if (
+        !newTitle.value ||
+        !newDescription.value ||
+        !newImages.value ||
+        !newDisplayed.value
+      ) {
         console.error("All fields are required");
         return;
       }
 
       try {
-
         const response = await axios.post("/exhibit/add", {
           exhibitName: newTitle.value,
           description: newDescription.value,
@@ -286,6 +317,9 @@ export default {
       newImages,
       newDisplayed,
       newExhibit,
+      fileToBase64,
+      convertToBase64,
+      base64Array,
     };
   },
 };
