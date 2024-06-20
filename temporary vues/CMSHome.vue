@@ -61,13 +61,24 @@
                 ></v-checkbox>
                 <div class="horizontal-filter-title-separator"></div>
 
-                <v-toolbar color="white">
-                  <v-btn color="primary" @click=""> Apply </v-btn>
+                <v-toolbar
+                  color="white"
+                >
+                  
+                  <v-btn 
+                    color="primary" 
+                    @click=""
+                  >
+                    Apply
+                  </v-btn>
 
                   <v-spacer></v-spacer>
 
                   <v-card-actions>
-                    <v-btn color="secondary" @click="isActive.value = false">
+                    <v-btn 
+                      color="secondary" 
+                      @click="isActive.value = false"
+                    >
                       Close
                     </v-btn>
                   </v-card-actions>
@@ -88,11 +99,11 @@
             <v-icon>mdi-logout-variant</v-icon>
           </v-btn>
         </v-app-bar>
-
+        
         <v-container
           class="mt-16 mb-3"
           min-height="500"
-          style="padding: 16px 2px; margin-left: 0px"
+          style="padding: 16px 2px; margin-left: 0px;"
         >
           <v-row>
             <v-col
@@ -112,99 +123,35 @@
                 <v-card-title>{{ exhibit.name }}</v-card-title>
               </v-card>
             </v-col>
-            <v-col class="d-flex align-center justify-center" cols="2">
-              <v-dialog max-width="800" persistent>
-                <template v-slot:activator="{ props: openCreateNewWindow }">
-                  <v-btn
-                    class=""
-                    v-bind="openCreateNewWindow"
-                    :ripple="false"
-                    color="#14baee"
-                    height="200"
-                    width="100%"
-                    elevation="8"
+            <v-col
+              class="d-flex align-center justify-center"
+              cols="2"
+            >
+              <v-card
+                class=""
+                @click="addNewExhibit"
+                color="#14baee"
+                height="200"
+                width="100%"
+                rounded
+                elevation="8"
+              >
+                <v-card-text
+                  class="text-center add-card-top-margin"
+                >
+                  <v-icon
+                    :size="64"
+                    color="white"
                   >
-                    <v-icon class="add-card-icon" :size="64" color="white">
-                      mdi-plus
-                    </v-icon>
-                  </v-btn>
-                </template>
-                <template v-slot:default="{ isActive }">
-                  <v-card class="pt-8 pb-8">
-                    <v-card-title class="text-center"
-                      >Add new exhibit</v-card-title
-                    >
-                    <div class="horizontal-addnew-title-separator"></div>
-                    <v-text-field
-                      class="new-name-bar ml-10"
-                      v-model="newTitle"
-                      label="Exhibit name..."
-                      :rules="[rules.required]"
-                      variant="underlined"
-                      clearable
-                    ></v-text-field>
-
-                    <v-textarea
-                      class="new-name-bar mt-4 ml-10"
-                      v-model="newDescription"
-                      label="Exhibit description..."
-                      :rules="[rules.required]"
-                      variant="underlined"
-                      clearable
-                    ></v-textarea>
-
-                    <v-file-input
-                      class="new-name-bar mt-4 ml-10"
-                      v-model="newImages"
-                      label="Exhibit images..."
-                      :rules="[rules.required]"
-                      variant="underlined"
-                      clearable
-                      chips
-                      multiple
-                    ></v-file-input>
-
-                    <v-checkbox
-                      v-model="newDisplayed"
-                      class="ml-10 top-checkbox-top-margin"
-                      :ripple="false"
-                      label="Display exhibit"
-                      color="#EB4511"
-                      density="compact"
-                    ></v-checkbox>
-
-                    <v-toolbar
-                      class="mt-6"
-                      color="white"
-                    >
-                      <v-card-actions>
-                        <v-btn
-                          class="ml-16"
-                          color="primary"
-                          @click="()=>{{isActive.value = false}}"
-                        >
-                          Add New
-                        </v-btn>
-                      </v-card-actions>
-
-                      <v-spacer></v-spacer>
-
-                      <v-card-actions>
-                        <v-btn
-                          class="mr-16"
-                          color="secondary"
-                          @click="isActive.value = false"
-                        >
-                          Close
-                        </v-btn>
-                      </v-card-actions>
-                    </v-toolbar>
-                  </v-card>
-                </template>
-              </v-dialog>
+                    mdi-plus
+                  </v-icon>
+                </v-card-text>
+              </v-card>
             </v-col>
           </v-row>
         </v-container>
+
+
       </v-container>
 
       <v-container v-else> </v-container>
@@ -223,10 +170,6 @@ export default {
     const displayedExhibits = ref(false);
     const hiddenExhibits = ref(false);
     const exhibits = ref([]);
-    const newTitle = ref("");
-    const newDescription = ref("");
-    const newImages = ref([]);
-    const newDisplayed = ref(false);
 
     const piniaStorage = usePiniaStorage();
     const router = useRouter();
@@ -247,45 +190,17 @@ export default {
       };
     });
 
-    const rules = {
-      required: (v) => !!v || "This field is required",
-    };
-
     const logout = async () => {
       await piniaStorage.clearAuthData();
       router.push({ name: "login" });
     };
 
-    const newExhibit = async () => {
-
-      if (!newTitle.value || !newDescription.value || !newImages.value || !newDisplayed.value) {
-        console.error("All fields are required");
-        return;
-      }
-
-      try {
-
-        const response = await axios.post("/exhibit/add", {
-          exhibitName: newTitle.value,
-          description: newDescription.value,
-        });
-      } catch (error) {
-        console.error("Adding exhibit failed:", error);
-      }
-    };
-
     return {
       isMobile,
-      rules,
       logout,
       displayedExhibits,
       hiddenExhibits,
-      exhibits,
-      newTitle,
-      newDescription,
-      newImages,
-      newDisplayed,
-      newExhibit,
+      exhibits
     };
   },
 };
@@ -315,16 +230,6 @@ export default {
   border-radius: 5px;
 }
 
-.horizontal-addnew-title-separator {
-  height: 1px;
-  width: 90%;
-  align-self: center;
-  background-color: #eb4511;
-  margin-top: 6px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-}
-
 .top-checkbox-top-margin {
   margin-top: 22px;
 }
@@ -334,10 +239,6 @@ export default {
 }
 
 .card-container-padding-ow {
-  padding-left: 8px !important;
-}
-
-.new-name-bar {
-  max-width: 90%;
+  padding-left: 8px !important; 
 }
 </style>

@@ -245,6 +245,8 @@ export default {
         });
 
         console.log("Login successful:", response.data);
+        localStorage.setItem("token", response.data.token)
+        localStorage.setItem("isAdmin", response.data.isAdmin)
         piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
 
         if(piniaStorage.getAdmin && isMobile.value) { router.push({ name: 'warning' }); }
