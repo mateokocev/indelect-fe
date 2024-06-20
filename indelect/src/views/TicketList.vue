@@ -1,18 +1,52 @@
-<template>
- <v-app>
-<div>
-<v-container v-if="!isMobile" >
+<template  pa-0 ma-0y>
+ <v-app >
 
+<v-container v-if="!isMobile" >
 </v-container>
-<v-container v-else>
+<v-container style="margin: 0; padding: 0;" v-else>
+  
+  <v-card>
+    <v-layout>
+      <v-app-bar color="primary" prominent>
+        <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+
+        <v-toolbar-title>Welcome to Tickets Selection</v-toolbar-title>
+
+        <v-spacer></v-spacer>
+
+        <template v-if="$vuetify.display.mdAndUp">
+          <v-btn icon><v-icon>mdi-magnify</v-icon></v-btn>
+          <v-btn icon><v-icon>mdi-filter</v-icon></v-btn>
+        </template>
+
+        <!-- Home Button -->
+        <v-btn icon @click="goHome">
+          <v-icon>mdi-home</v-icon>
+        </v-btn>
+
+        <!-- Settings Button -->
+        <v-btn icon @click="goSettings">
+          <v-icon>mdi-settings</v-icon>
+        </v-btn>
+
+        <v-btn icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
+      </v-app-bar>
+
+      <v-navigation-drawer v-model="drawer" :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
+        <v-list :items="items"></v-list>
+      </v-navigation-drawer>
+
+      <v-main style="height: 500px;">
+        <v-card-text>
+          <!-- Your main content here -->
+        </v-card-text>
+      </v-main>
+    </v-layout>
+  </v-card>
   <div>
     <v-app>
       <v-container>
-        <v-img
-          class="mx-auto my-6"
-          max-width="350"
-          src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
-        ></v-img>
+       
 
         <v-card
           class="mx-auto pa-12 pb-8"
@@ -50,7 +84,7 @@
     </v-app>
   </div>
 </v-container>
-</div>
+
  </v-app>
 </template>
 
@@ -59,15 +93,18 @@
 import { RouterLink, useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
 import { usePiniaStorage } from "../store/index.js";
+import qrcode from "qrcode";
+import axios from "axios";
 
 export default {
-  setup() {
+
+   setup() {
     const isMobile = ref(false);
 
     const piniaStorage = usePiniaStorage();
     const router = useRouter();
 
-    onMounted(() => {
+    onMounted(async () => {
       const updateIsMobile = () => {
         isMobile.value = window.innerWidth <= 480;
         if (!isMobile.value) {
@@ -77,10 +114,18 @@ export default {
 
       updateIsMobile();
       window.addEventListener("resize", updateIsMobile);
+      //----------------------------
 
+      const tickets = await fetchAllTickets();
+      console.log(tickets);
+      //----------------------
       return () => {
         window.removeEventListener("resize", updateIsMobile);
       };
+      
+
+
+     
     });
 
     const logout = async () => {
@@ -88,11 +133,50 @@ export default {
       router.push({ name: "login" });
     };
 
+    const fetchAllTickets = async () => {
+      try {
+        const response = await axios.get("/ticket/getAllTickets"); 
+        console.log("Tickets fetched successfully:", response.data);
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching tickets:", error);
+        return [];
+      }
+    };
+
+    const generateQRCodesForAllTickets = async (email) => {
+  try {
+    email="ovojetest@gmail.com"
+    const tickets = await Ticket.find({});
+    for (const ticket of tickets) {
+      await generateUniqueQRCode(ticket, email);
+    }
+  } catch (error) {
+    console.error("Error fetching tickets:", error);
+  } finally {
+    mongoose.connection.close();
+  }
+};
+
+    const hello = () => {
+
+      return "hello" 
+    };
+
+
+
     return {
       isMobile,
       logout,
     };
+
+
   },
+
+
+
+
+
 };
 </script>
 
