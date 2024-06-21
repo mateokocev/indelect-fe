@@ -155,16 +155,15 @@
 
                     <v-file-input
                       class="new-name-bar mt-4 ml-10"
-                      v-model="newImages"
+                      v-model="orderattachment"
                       label="Exhibit images..."
                       :rules="[rules.required]"
-                      @change="convertToBase64"
                       variant="underlined"
                       clearable
                       chips
                       multiple
                     ></v-file-input>
-                    <v-btn @click="convertToBase64"> haha gae </v-btn>
+                    <v-btn @click="printBase"> Printaj slike (test)</v-btn>
 
                     <v-checkbox
                       v-model="newDisplayed"
@@ -180,13 +179,10 @@
                         <v-btn
                           class="ml-16"
                           color="primary"
-                          @click="
-                            () => {
-                              {
-                                isActive.value = false;
-                              }
-                            }
-                          "
+                          @click="() => {
+                              isActive.value = false; 
+                              newExhibit();
+                            }"
                         >
                           Add New
                         </v-btn>
@@ -219,8 +215,9 @@
 
 <script>
 import { RouterLink, useRouter } from "vue-router";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { usePiniaStorage } from "../store/index.js";
+import axios from "axios";
 
 export default {
   setup() {
@@ -230,9 +227,9 @@ export default {
     const exhibits = ref([]);
     const newTitle = ref("");
     const newDescription = ref("");
-    const newImages = ref([]);
+    const base64Files = ref([]);
+    const orderattachment = ref([]);
     const newDisplayed = ref(false);
-    const base64Array = ref([]);
 
     const piniaStorage = usePiniaStorage();
     const router = useRouter();
@@ -262,34 +259,31 @@ export default {
       router.push({ name: "login" });
     };
 
-    const convertToBase64 = async (newImages) => {
-      const base64Array = [];
-      console.log(newImages);
+    const printBase = async () => {
+      console.log(base64Files.value);
+    }
 
-      const fileArray = Array.from(newImages);
-      for (const file of fileArray) {
-        base64Array.push(await fileToBase64(file));
-      }
+    watch(orderattachment, (files) => {
+      base64Files.value = [];
+      if (!files.length) return;
 
-      console.log(base64Array.value);
-      return base64Array;
-    };
-
-    const fileToBase64 = (file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file);
+      files.forEach(file => {
+        let fr = new FileReader();
+        fr.addEventListener("load", (e) => {
+          base64Files.value.push(e.target.result);
+        });
+        fr.addEventListener("error", (e) => {
+          console.error(`Error reading file ${file.name}:`, e);
+        });
+        fr.readAsDataURL(file);
       });
-    };
+    });
 
     const newExhibit = async () => {
       if (
         !newTitle.value ||
         !newDescription.value ||
-        !newImages.value ||
-        !newDisplayed.value
+        !base64Files.value
       ) {
         console.error("All fields are required");
         return;
@@ -299,7 +293,12 @@ export default {
         const response = await axios.post("/exhibit/add", {
           exhibitName: newTitle.value,
           description: newDescription.value,
-        });
+          images: base64Files.value,
+          isDisplayed: newDisplayed.value
+        }
+      );
+
+        console.log("Addition successful:", response.data);
       } catch (error) {
         console.error("Adding exhibit failed:", error);
       }
@@ -314,12 +313,13 @@ export default {
       exhibits,
       newTitle,
       newDescription,
-      newImages,
+      base64Files,
+      orderattachment,
       newDisplayed,
       newExhibit,
-      fileToBase64,
-      convertToBase64,
-      base64Array,
+      watch,
+      printBase,
+
     };
   },
 };

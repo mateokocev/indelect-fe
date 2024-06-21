@@ -8,7 +8,7 @@ import * as directives from 'vuetify/directives'
 
 import axios from 'axios'
 import { PiniaVuePlugin, createPinia } from 'pinia'
-axios.defaults.baseURL = "http://localhost:3030/api";
+axios.defaults.baseURL = "http://localhost:3000/api";
 
 const pinia = createPinia()
 const app = createApp(App)
