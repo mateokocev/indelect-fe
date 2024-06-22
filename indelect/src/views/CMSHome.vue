@@ -127,9 +127,7 @@
                 </template>
                 <template v-slot:default="{ isActive }">
                   <v-card class="pt-8 pb-8">
-                    <v-card-title class="text-center"
-                      >Modify the exhibit</v-card-title
-                    >
+                    <v-card-title class="text-center">Modify the exhibit: </v-card-title>
                     <div class="horizontal-addnew-title-separator"></div>
                     <v-text-field
                       class="new-name-bar ml-10"
@@ -150,8 +148,8 @@
                     ></v-textarea>
 
                     <v-file-input
-                      class="new-name-bar mt-4 ml-10"
-                      v-model="exhibitImages"
+                      class="new-name-bar mt-4 ml-10 mb-n10"
+                      v-model="orderattachment"
                       label="Exhibit images..."
                       :rules="[rules.required]"
                       variant="underlined"
@@ -159,6 +157,7 @@
                       chips
                       multiple
                     ></v-file-input>
+                    <v-card-text class="ml-14 text-red text-caption">Warning: The images will be overwritten upon the selection of new ones</v-card-text>
 
                     <v-checkbox
                       v-model="exhibitDisplayed"
@@ -188,7 +187,7 @@
                           class="ml-16"
                           color="primary"
                           @click="() => {
-                              loadExhibit();
+                              updateExhibit();
                             }"
                         >
                           Save changes
@@ -348,6 +347,7 @@ import axios from "axios";
 export default {
   setup() {
     const isMobile = ref(false);
+    const isActive = ref(false);
     const displayedExhibits = ref(false);
     const hiddenExhibits = ref(false);
 
@@ -470,13 +470,62 @@ export default {
     const loadExhibitData = (exhibit) => {
       console.log("Exhibit Data:", exhibit);
       exhibitTitle.value = exhibit.exhibitName;
-      console.log(exhibit.exhibitName)
       exhibitDescription.value = exhibit.description;
-      console.log(exhibitDescription.value)
-      exhibitImages.value = exhibit.images;
-      console.log(exhibitImages.value)
+      exhibitImages.value = convertBase64ToFiles(exhibit.images);
       exhibitDisplayed.value = exhibit.isDisplayed;
-      console.log(exhibitDisplayed.value)
+      exhibitID.value = exhibit._id;
+    };
+
+    const convertBase64ToFiles = (base64Array) => {
+      const files = base64Array.map((base64, index) => {
+        const byteString = atob(base64.split(',')[1]);
+        const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
+
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([ab], { type: mimeString });
+        const file = new File([blob], `image_${index}.png`, { type: mimeString });
+        return file;
+      });
+
+      return files;
+    };
+
+    const updateExhibit = async () => {
+      showError.value = false;
+
+      if (!exhibitID.value || !exhibitTitle.value || !exhibitDescription.value) {
+        console.error("All fields are required");
+        showError.value = true;
+        return;
+      }
+
+      const updateData = {
+        exhibitName: exhibitTitle.value,
+        description: exhibitDescription.value,
+        images: base64Files.value,
+        isDisplayed: exhibitDisplayed.value,
+      };
+      console.log('Sending update request with data:', { id: exhibitID.value, updateData });
+
+      try {
+        const response = await axios.post("/exhibit/update", {
+          id: exhibitID.value,
+          updateData,
+        });
+
+        isActive.value = false;
+        onClosedDialogReset();
+        getAllExhibits();
+        console.log("Update successful:", response.data);
+      } catch (error) {
+        console.error("Updating exhibit failed:", error);
+        showError.value = true;
+      }
     };
 
     return {
@@ -502,6 +551,9 @@ export default {
       exhibitImages,
       exhibitDisplayed,
       loadExhibitData,
+      convertBase64ToFiles,
+      updateExhibit,
+      isActive,
     };
   },
 };
