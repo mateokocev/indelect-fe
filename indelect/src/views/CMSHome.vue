@@ -88,30 +88,140 @@
             <v-icon>mdi-logout-variant</v-icon>
           </v-btn>
         </v-app-bar>
-
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+        <!-- Exhibit buttons -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
         <v-container
           class="mt-16 mb-3"
-          min-height="500"
           style="padding: 16px 2px; margin-left: 0px"
         >
           <v-row>
             <v-col
-              class="d-flex align-center justify-center"
-              cols="2"
-              v-for="(exhibit, index) in exhibits"
-              :key="index"
+            v-for="(exhibit, index) in exhibits"
+            :key="exhibit._id"
+            class="d-flex align-center justify-center"
+            cols="2"
             >
-              <v-card
-                class=""
-                @click="viewExhibit(exhibit)"
-                height="200"
-                width="100%"
-                rounded
-                elevation="8"
-              >
-                <v-card-title>{{ exhibit.name }}</v-card-title>
-              </v-card>
+              <v-dialog max-width="800" persistent>
+                <template v-slot:activator="{ props: openEditExistingWindow }">
+                  <v-btn
+                    class=""
+                    v-bind="openEditExistingWindow"
+                    :ripple="false"
+                    color="red"
+                    height="200"
+                    width="100%"
+                    elevation="8"
+                    @click="loadExhibitData(exhibit)"
+                  >
+                    <v-icon class="add-card-icon" :size="64" color="white">
+                      mdi-plus
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <template v-slot:default="{ isActive }">
+                  <v-card class="pt-8 pb-8">
+                    <v-card-title class="text-center">Modify the exhibit: </v-card-title>
+                    <div class="horizontal-addnew-title-separator"></div>
+                    <v-text-field
+                      class="new-name-bar ml-10"
+                      v-model="exhibitTitle"
+                      label="Exhibit name..."
+                      :rules="[rules.required]"
+                      variant="underlined"
+                      clearable
+                    ></v-text-field>
+
+                    <v-textarea
+                      class="new-name-bar mt-4 ml-10"
+                      v-model="exhibitDescription"
+                      label="Exhibit description..."
+                      :rules="[rules.required]"
+                      variant="underlined"
+                      clearable
+                    ></v-textarea>
+
+                    <v-file-input
+                      class="new-name-bar mt-4 ml-10 mb-n10"
+                      v-model="orderattachment"
+                      label="Exhibit images..."
+                      :rules="[rules.required]"
+                      variant="underlined"
+                      clearable
+                      chips
+                      multiple
+                    ></v-file-input>
+                    <v-card-text class="ml-14 text-red text-caption">Warning: The images will be overwritten upon the selection of new ones</v-card-text>
+
+                    <v-checkbox
+                      v-model="exhibitDisplayed"
+                      class="ml-10 top-checkbox-top-margin"
+                      :ripple="false"
+                      label="Display exhibit"
+                      color="#EB4511"
+                      density="compact"
+                    ></v-checkbox>
+
+                    <v-card
+                      v-if="showError"
+                      class="mx-auto pa-2 mb-12"
+                      elevation="2"
+                      max-width="400"
+                      rounded="lg"
+                      color="#e89c9c"
+                    >
+                      <v-card-text>
+                        Modifying the exhibit failed due to unspecified reasons. Check all the fields or if you believe this to be as error contact the system administrator.
+                      </v-card-text>
+                    </v-card>
+
+                    <v-toolbar class="mt-6" color="white">
+                      <v-card-actions>
+                        <v-btn
+                          class="ml-16"
+                          color="primary"
+                          @click="() => {
+                              updateExhibit();
+                            }"
+                        >
+                          Save changes
+                        </v-btn>
+                      </v-card-actions>
+
+                      <v-spacer></v-spacer>
+
+                      <v-card-actions>
+                        <v-btn
+                          class="mr-16"
+                          color="secondary"
+                          @click="() => {
+                              isActive.value = false; 
+                              onClosedDialogReset();
+                            }"
+                        >
+                          Close
+                        </v-btn>
+                      </v-card-actions>
+                    </v-toolbar>
+                  </v-card>
+                </template>
+              </v-dialog>
             </v-col>
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+              <!-- Exhibit new -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
             <v-col class="d-flex align-center justify-center" cols="2">
               <v-dialog max-width="800" persistent>
                 <template v-slot:activator="{ props: openCreateNewWindow }">
@@ -174,13 +284,25 @@
                       density="compact"
                     ></v-checkbox>
 
+                    <v-card
+                      v-if="showError"
+                      class="mx-auto pa-2 mb-12"
+                      elevation="2"
+                      max-width="400"
+                      rounded="lg"
+                      color="#e89c9c"
+                    >
+                      <v-card-text>
+                        Adding the exhibit failed due to unspecified reasons. Check all the fields or if you believe this to be as error contact the system administrator.
+                      </v-card-text>
+                    </v-card>
+
                     <v-toolbar class="mt-6" color="white">
                       <v-card-actions>
                         <v-btn
                           class="ml-16"
                           color="primary"
                           @click="() => {
-                              isActive.value = false; 
                               newExhibit();
                             }"
                         >
@@ -194,7 +316,10 @@
                         <v-btn
                           class="mr-16"
                           color="secondary"
-                          @click="isActive.value = false"
+                          @click="() => {
+                              isActive.value = false;
+                              onClosedDialogReset();
+                            }"
                         >
                           Close
                         </v-btn>
@@ -222,14 +347,23 @@ import axios from "axios";
 export default {
   setup() {
     const isMobile = ref(false);
+    const isActive = ref(false);
     const displayedExhibits = ref(false);
     const hiddenExhibits = ref(false);
-    const exhibits = ref([]);
+
     const newTitle = ref("");
     const newDescription = ref("");
     const base64Files = ref([]);
     const orderattachment = ref([]);
     const newDisplayed = ref(false);
+    const showError = ref(false);
+
+    const exhibits = ref([]);
+    const exhibitTitle = ref("");
+    const exhibitDescription = ref("");
+    const exhibitImages = ref([]);
+    const exhibitDisplayed = ref(false);
+    const exhibitID = ref("");
 
     const piniaStorage = usePiniaStorage();
     const router = useRouter();
@@ -245,6 +379,8 @@ export default {
       updateIsMobile();
       window.addEventListener("resize", updateIsMobile);
 
+      getAllExhibits();
+
       return () => {
         window.removeEventListener("resize", updateIsMobile);
       };
@@ -259,9 +395,19 @@ export default {
       router.push({ name: "login" });
     };
 
+    const onClosedDialogReset = () => {
+
+      newTitle.value = "";
+      newDescription.value = "";
+      orderattachment.value = [];
+      newDisplayed.value = false;
+      base64Files.value = [];
+      showError.value = false;
+    };
+
     const printBase = async () => {
       console.log(base64Files.value);
-    }
+    };
 
     watch(orderattachment, (files) => {
       base64Files.value = [];
@@ -280,12 +426,15 @@ export default {
     });
 
     const newExhibit = async () => {
+      showError.value = false;
+
       if (
         !newTitle.value ||
         !newDescription.value ||
         !base64Files.value
       ) {
         console.error("All fields are required");
+        showError.value = true;
         return;
       }
 
@@ -295,12 +444,87 @@ export default {
           description: newDescription.value,
           images: base64Files.value,
           isDisplayed: newDisplayed.value
-        }
-      );
+        });
 
+        isActive.value = false;
+        onClosedDialogReset();
+        getAllExhibits();
         console.log("Addition successful:", response.data);
+        
       } catch (error) {
         console.error("Adding exhibit failed:", error);
+        showError.value = true;
+      }
+    };
+
+    const getAllExhibits = async () => {
+      try {
+        const response = await axios.get("/exhibit/getall");
+        exhibits.value = response.data;
+        console.log(exhibits.value);
+      } catch (error) {
+        console.error("Getting exhibits failed:", error);
+      }
+    };
+
+    const loadExhibitData = (exhibit) => {
+      console.log("Exhibit Data:", exhibit);
+      exhibitTitle.value = exhibit.exhibitName;
+      exhibitDescription.value = exhibit.description;
+      exhibitImages.value = convertBase64ToFiles(exhibit.images);
+      exhibitDisplayed.value = exhibit.isDisplayed;
+      exhibitID.value = exhibit._id;
+    };
+
+    const convertBase64ToFiles = (base64Array) => {
+      const files = base64Array.map((base64, index) => {
+        const byteString = atob(base64.split(',')[1]);
+        const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
+
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+
+        const blob = new Blob([ab], { type: mimeString });
+        const file = new File([blob], `image_${index}.png`, { type: mimeString });
+        return file;
+      });
+
+      return files;
+    };
+
+    const updateExhibit = async () => {
+      showError.value = false;
+
+      if (!exhibitID.value || !exhibitTitle.value || !exhibitDescription.value) {
+        console.error("All fields are required");
+        showError.value = true;
+        return;
+      }
+
+      const updateData = {
+        exhibitName: exhibitTitle.value,
+        description: exhibitDescription.value,
+        images: base64Files.value,
+        isDisplayed: exhibitDisplayed.value,
+      };
+      console.log('Sending update request with data:', { id: exhibitID.value, updateData });
+
+      try {
+        const response = await axios.post("/exhibit/update", {
+          id: exhibitID.value,
+          updateData,
+        });
+
+        isActive.value = false;
+        onClosedDialogReset();
+        getAllExhibits();
+        console.log("Update successful:", response.data);
+      } catch (error) {
+        console.error("Updating exhibit failed:", error);
+        showError.value = true;
       }
     };
 
@@ -319,7 +543,17 @@ export default {
       newExhibit,
       watch,
       printBase,
-
+      onClosedDialogReset,
+      showError,
+      getAllExhibits,
+      exhibitTitle,
+      exhibitDescription,
+      exhibitImages,
+      exhibitDisplayed,
+      loadExhibitData,
+      convertBase64ToFiles,
+      updateExhibit,
+      isActive,
     };
   },
 };
