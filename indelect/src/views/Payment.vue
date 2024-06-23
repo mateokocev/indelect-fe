@@ -23,15 +23,7 @@
         <v-list-item-title>Jim R</v-list-item-title>
       </v-list-item>
       <v-divider></v-divider>
-      <v-list dense>
-        <v-list-item link @click="goHome">
-          <v-list-item-icon>
-            <v-icon>mdi-home</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>Home</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+      <v-list dense>          
         <v-list-item link @click="logout">
           <v-list-item-icon>
             <v-icon>mdi-logout</v-icon>
@@ -41,14 +33,7 @@
           </v-list-item-content>
         </v-list-item>
         <v-divider></v-divider>
-        <v-list-item v-for="item in items" :key="item.title" link>
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        
       </v-list>
     </v-navigation-drawer>
 
@@ -77,7 +62,7 @@
             v-model="paymentDetails.cvc"
             required
           ></v-text-field>
-          <v-btn type="submit" class="pay-button" color="primary" @click="getQrCode()">Pay Now</v-btn>
+          <v-btn type="submit" class="pay-button" color="primary" @click="this.getQrCode()">Pay Now</v-btn>
         </v-form>
       </v-container>
     </v-main>
@@ -90,38 +75,67 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 
 export default {
-  data() {
-    return {
-      paymentDetails: {
-        cardNumber: '',
-        expiryDate: '',
-        cvc: ''
-      },
-      drawer: false,
-      items: [
-        { title: 'Item 1', icon: 'mdi-menu' },
-        { title: 'Item 2', icon: 'mdi-menu' },
-      ],
-      cardNumberRules: [
-        v => !!v || 'Card number is required',
-        v => /^\d{16}$/.test(v) || 'Card number must be 16 digits'
-      ],
-      expiryDateRules: [
-        v => !!v || 'Expiry date is required',
-        v => /^\d{2}\/\d{2}$/.test(v) || 'Expiry date must be in MM/YY format'
-      ],
-      cvcRules: [
-        v => !!v || 'CVC is required',
-        v => /^\d{3,4}$/.test(v) || 'CVC must be 3 or 4 digits'
-      ]
-    };
+  name: 'Payment',
+  methods: {
+    async getQrCode() {
+      try {
+        const mail = localStorage.getItem("userEmail");
+        const museumName = this.$route.params.MuseumName.slice(0, -2);
+        const params = new URLSearchParams({ mail: mail, museumName: museumName });
+        const response = await axios.get(`/ticket/getQrCode?${params.toString()}`);
+        console.log("QR Code data:", response.data);
+        this.usporedi(response.data)
+      } catch (error) {
+        console.error("Failed to fetch QR Code data:", error);
+      }
+    },
+
+
+   async usporedi(nasQrCode)
+    {
+
+    // usporedi response odozgo sa podatkom iz monga
+
+    // napravit rutu na bacekendu 
+    //slati sa frontenda qr code na tu rutu na backendu 
+        // na backendu usporediti ta dva podatka
+
+        const response = await axios.get(`/usporedi/?${nasQrCode}`);
+        if(response.data)
+        {
+          router.push({ name: this.museumName });
+        }
+
+    }
   },
+
   setup() {
     const router = useRouter();
     const isMobile = ref(false);
     const tickets = ref([]);
     const mini = ref(false);
     const drawer = ref(false);
+
+    const paymentDetails = ref({
+      cardNumber: '',
+      expiryDate: '',
+      cvc: ''
+    });
+
+    const cardNumberRules = [
+      v => !!v || 'Card number is required',
+      v => /^\d{16}$/.test(v) || 'Card number must be 16 digits'
+    ];
+
+    const expiryDateRules = [
+      v => !!v || 'Expiry date is required',
+      v => /^\d{2}\/\d{2}$/.test(v) || 'Expiry date must be in MM/YY format'
+    ];
+
+    const cvcRules = [
+      v => !!v || 'CVC is required',
+      v => /^\d{3,4}$/.test(v) || 'CVC must be 3 or 4 digits'
+    ];
 
     const updateIsMobile = () => {
       isMobile.value = window.innerWidth <= 480;
@@ -143,49 +157,31 @@ export default {
       return () => {
         window.removeEventListener("resize", updateIsMobile);
       };
-    });
-  
-    const getQrCode = async () => {
-      try {
-        const mail = localStorage.getItem("userEmail");
-        MuseumName= $route.params.MuseumName.slice(-2) 
-        const params = new URLSearchParams({ mail: mail.value, museumName: museumName.value });
-        const response = await axios.get(`/ticket/getQrCode?${params.toString()}`);
-        qrCodeData.value = response.data;
-        console.log("QR Code data:", qrCodeData.value);
-      } catch (error) {
-        console.error("Failed to fetch QR Code data:", error);
-      }
-    };
 
-    const goHome = () => {
-      router.push({ name: "home" });
-    };
+      
+    });
+
+    
 
     const logout = async () => {
       // Implement your logout logic
       router.push({ name: "login" });
     };
 
-    const processPayment = () => {
-      axios.post('/api/payment', this.paymentDetails)
-        .then(response => {
-          alert('Payment successful!');
-          router.push('/home');
-        })
-        .catch(error => {
-          alert('Payment failed.');
-        });
+    const processPayment = async () => {
+    
     };
 
     return {
+      paymentDetails,
+      cardNumberRules,
+      expiryDateRules,
+      cvcRules,
       isMobile,
       tickets,
       drawer,
-      goHome,
       logout,
       processPayment,
-      getQrCode,
     };
   },
 };
