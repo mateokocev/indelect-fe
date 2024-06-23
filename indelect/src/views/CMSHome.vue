@@ -46,6 +46,7 @@
 
                 <v-checkbox
                   class="ml-6 top-checkbox-top-margin"
+                  v-model="displayedExhibits"
                   :ripple="false"
                   label="Displayed exhibits"
                   color="#EB4511"
@@ -54,6 +55,7 @@
 
                 <v-checkbox
                   class="ml-6"
+                  v-model="hiddenExhibits"
                   :ripple="false"
                   label="Hidden exhibits"
                   color="#EB4511"
@@ -61,16 +63,14 @@
                 ></v-checkbox>
                 <div class="horizontal-filter-title-separator"></div>
 
+                
                 <v-toolbar color="white">
-                  <v-btn color="primary" @click=""> Apply </v-btn>
-
-                  <v-spacer></v-spacer>
-
                   <v-card-actions>
-                    <v-btn color="secondary" @click="isActive.value = false">
+                    <v-btn class="justify-center" color="secondary" @click="isActive.value = false">
                       Close
                     </v-btn>
                   </v-card-actions>
+
                 </v-toolbar>
               </v-card>
             </template>
@@ -103,7 +103,7 @@
         >
           <v-row>
             <v-col
-            v-for="(exhibit, index) in exhibits"
+            v-for="(exhibit, index) in filteredExhibits"
             :key="exhibit._id"
             class="d-flex align-center justify-center"
             cols="2"
@@ -111,18 +111,20 @@
               <v-dialog max-width="800" persistent>
                 <template v-slot:activator="{ props: openEditExistingWindow }">
                   <v-btn
-                    class=""
+                    class="exhibit-btn"
                     v-bind="openEditExistingWindow"
                     :ripple="false"
-                    color="red"
                     height="200"
                     width="100%"
                     elevation="8"
                     @click="loadExhibitData(exhibit)"
+                    :style="{
+                      backgroundImage: `url(${exhibit.images[0]})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }"
                   >
-                    <v-icon class="add-card-icon" :size="64" color="white">
-                      mdi-plus
-                    </v-icon>
+                  <v-card-title class="white--text">{{ exhibit.exhibitName }}</v-card-title>
                   </v-btn>
                 </template>
                 <template v-slot:default="{ isActive }">
@@ -186,15 +188,24 @@
                         <v-btn
                           class="ml-16"
                           color="primary"
-                          @click="() => {
-                              updateExhibit();
-                            }"
+                          @click="updateExhibit"
                         >
                           Save changes
                         </v-btn>
                       </v-card-actions>
 
                       <v-spacer></v-spacer>
+
+                      <v-card-actions>
+                        <v-btn
+                          class="ml-16 text-red"
+                          @click="() => {
+                              isActive.value = deleteExhibit();
+                            }"
+                        >
+                          Delete
+                        </v-btn>
+                      </v-card-actions>
 
                       <v-card-actions>
                         <v-btn
@@ -273,7 +284,6 @@
                       chips
                       multiple
                     ></v-file-input>
-                    <v-btn @click="printBase"> Printaj slike (test)</v-btn>
 
                     <v-checkbox
                       v-model="newDisplayed"
@@ -302,9 +312,7 @@
                         <v-btn
                           class="ml-16"
                           color="primary"
-                          @click="() => {
-                              newExhibit();
-                            }"
+                          @click="newExhibit"
                         >
                           Add New
                         </v-btn>
@@ -340,17 +348,27 @@
 
 <script>
 import { RouterLink, useRouter } from "vue-router";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { usePiniaStorage } from "../store/index.js";
 import axios from "axios";
 
 export default {
+  data() {
+    return {
+      displayedExhibits: ref(true),
+      hiddenExhibits: ref(true)
+    }
+  },
+
   setup() {
+    // site setup i app bar
     const isMobile = ref(false);
     const isActive = ref(false);
-    const displayedExhibits = ref(false);
-    const hiddenExhibits = ref(false);
+    const displayedExhibits = ref(true);
+    const hiddenExhibits = ref(true);
+    const search = ref("");
 
+    // novi exhibiti
     const newTitle = ref("");
     const newDescription = ref("");
     const base64Files = ref([]);
@@ -358,6 +376,7 @@ export default {
     const newDisplayed = ref(false);
     const showError = ref(false);
 
+    // postojeci exhibiti
     const exhibits = ref([]);
     const exhibitTitle = ref("");
     const exhibitDescription = ref("");
@@ -425,6 +444,33 @@ export default {
       });
     });
 
+    const filteredExhibits = computed(() => {
+      let filtered = exhibits.value;
+
+      if (displayedExhibits.value && !hiddenExhibits.value) {
+        filtered = filtered.filter(exhibit => exhibit.isDisplayed);
+      } else if (!displayedExhibits.value && hiddenExhibits.value) {
+        filtered = filtered.filter(exhibit => !exhibit.isDisplayed);
+      } else if (!displayedExhibits.value && !hiddenExhibits.value) {
+        return [];
+      }
+
+      if (search.value) {
+        const query = search.value.toLowerCase();
+        filtered = filtered.filter(exhibit =>
+          exhibit.exhibitName.toLowerCase().includes(query)
+        );
+      }
+
+      return filtered;
+    });
+// 
+// 
+//       POZIV RUTA
+// 
+// 
+
+
     const newExhibit = async () => {
       showError.value = false;
 
@@ -435,7 +481,6 @@ export default {
       ) {
         console.error("All fields are required");
         showError.value = true;
-        return;
       }
 
       try {
@@ -446,11 +491,9 @@ export default {
           isDisplayed: newDisplayed.value
         });
 
-        isActive.value = false;
         onClosedDialogReset();
-        getAllExhibits();
+        await getAllExhibits();
         console.log("Addition successful:", response.data);
-        
       } catch (error) {
         console.error("Adding exhibit failed:", error);
         showError.value = true;
@@ -471,28 +514,9 @@ export default {
       console.log("Exhibit Data:", exhibit);
       exhibitTitle.value = exhibit.exhibitName;
       exhibitDescription.value = exhibit.description;
-      exhibitImages.value = convertBase64ToFiles(exhibit.images);
+      exhibitImages.value = exhibit.images;
       exhibitDisplayed.value = exhibit.isDisplayed;
       exhibitID.value = exhibit._id;
-    };
-
-    const convertBase64ToFiles = (base64Array) => {
-      const files = base64Array.map((base64, index) => {
-        const byteString = atob(base64.split(',')[1]);
-        const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
-
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-
-        const blob = new Blob([ab], { type: mimeString });
-        const file = new File([blob], `image_${index}.png`, { type: mimeString });
-        return file;
-      });
-
-      return files;
     };
 
     const updateExhibit = async () => {
@@ -501,7 +525,6 @@ export default {
       if (!exhibitID.value || !exhibitTitle.value || !exhibitDescription.value) {
         console.error("All fields are required");
         showError.value = true;
-        return;
       }
 
       const updateData = {
@@ -518,9 +541,8 @@ export default {
           updateData,
         });
 
-        isActive.value = false;
         onClosedDialogReset();
-        getAllExhibits();
+        await getAllExhibits();
         console.log("Update successful:", response.data);
       } catch (error) {
         console.error("Updating exhibit failed:", error);
@@ -528,13 +550,31 @@ export default {
       }
     };
 
+    const deleteExhibit = async () => {
+      showError.value = false;
+      console.log(exhibitID.value);
+      try {
+        const response = await axios.delete("/exhibit/delete", {
+          data: { id: exhibitID.value }
+        });
+
+        onClosedDialogReset();
+        await getAllExhibits();
+        console.log("Delete successful:", response.data);
+      } catch (error) {
+        console.error("Deleting exhibit failed:", error);
+        showError.value = true;
+      }
+    };
+ 
     return {
       isMobile,
-      rules,
-      logout,
       displayedExhibits,
       hiddenExhibits,
       exhibits,
+      filteredExhibits,
+      rules,
+      logout,
       newTitle,
       newDescription,
       base64Files,
@@ -551,9 +591,10 @@ export default {
       exhibitImages,
       exhibitDisplayed,
       loadExhibitData,
-      convertBase64ToFiles,
       updateExhibit,
+      deleteExhibit,
       isActive,
+      search,
     };
   },
 };
@@ -607,5 +648,24 @@ export default {
 
 .new-name-bar {
   max-width: 90%;
+}
+
+.exhibit-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.exhibit-btn .v-card-title {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 0;
 }
 </style>
