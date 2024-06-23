@@ -34,14 +34,7 @@
             </v-list-item>
             <v-divider></v-divider>
             <v-list dense>
-              <v-list-item link @click="goHome">
-                <v-list-item-icon>
-                  <v-icon>mdi-home</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>Home</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
+              
               <v-list-item link @click="logout">
                 <v-list-item-icon>
                   <v-icon>mdi-logout</v-icon>
@@ -128,9 +121,7 @@ export default {
 
 
 
-    const goHome = () => {
-      router.push({ name: "home" });
-    };
+   
 
     const logout = async () => {
       // Implement your logout logic
@@ -145,7 +136,6 @@ export default {
       isMobile,
       tickets,
       drawer,
-      goHome,
       logout,
       goToPayment,
     };

@@ -2,70 +2,150 @@
   <v-app>
 <div>
 <v-container v-if="!isMobile" ></v-container>
+
 <v-contain v-else>
+  <v-app-bar
+    dense
+    clipped-left
+    color="#B02E0C"
+    app
+    dark
+    fixed
+    elevate-on-scroll
+  >
+    <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="btn-fix"></v-app-bar-nav-icon>
+    <v-toolbar-title>Indelect</v-toolbar-title>
+  </v-app-bar>
+
+  <v-navigation-drawer
+    class="fixed-drawer"
+    width="250"
+    v-model="drawer"
+    app
+  >
+    <v-list-item class="px-2">
+      <v-list-item-title>Jim R</v-list-item-title>
+    </v-list-item>
+    <v-divider></v-divider>
+    <v-list dense>
+      <v-list-item link @click="logout">
+        <v-list-item-icon>
+          <v-icon>mdi-logout</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Log Out</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider></v-divider>
+    </v-list>
+  </v-navigation-drawer>
+
   <v-card>
-  <div>
-    <h1>Welcome to the Museum Map</h1>
-    <div class="map-container">
-      <!-- Map Image (You can replace the image URL with your own map) -->
-      <img src="https://i.postimg.cc/fRJwkzhr/addada.png" alt="Museum Map" class="map-image" @click="handleMapClick($event)">
-      <!-- Hotspots -->
-      <v-btn v-for="spot in hotspots" :key="spot.id" class="hotspot-button" :style="{ left: spot.coordinates.x + 'px', top: spot.coordinates.y + 'px' }" icon @click="showExhibition(spot.id)" small color="red">
-        {{ spot.name }}
-      </v-btn>
-    </div>
-    <!-- Exhibition Item Details -->
-    <div v-if="selectedItem" class="exhibition-details">
-      <h2>Exhibition Item Details</h2>
-      <div>
-        <p>ID: {{ selectedItem.id }}</p>
-        <p>Name: {{ selectedItem.name }}</p>
-        <!-- Add more details as needed -->
+    <div>
+      <h1 class="mt-15">Welcome to the Museum Map</h1>
+      <div class="map-container">
+        <!-- Map Image (You can replace the image URL with your own map) -->
+        <img src="https://i.postimg.cc/fRJwkzhr/addada.png" alt="Museum Map" class="map-image" >
+        <!-- Hotspots -->
+         <div v-for="(exhibit, index) in exhibits"
+         :key="exhibit._id" > 
+          <v-btn class="hotspot-button">
+          {{ exhibit.exhibitName }}
+        </v-btn>
+      </div>
+       
+      </div>
+      <!-- Exhibition Item Details -->
+      <div v-if="selectedItem" class="exhibition-details">
+        <h2>Exhibition Item Details</h2>
+        <div>
+          <p>ID: {{ selectedItem.id }}</p>
+          <p>Name: {{ selectedItem.name }}</p>
+          <!-- Add more details as needed -->
+        </div>
       </div>
     </div>
-  </div>
-</v-card>
+  </v-card>
+
+  <!-- New container for exhibit buttons -->
+  <v-card>
+    <div class="exhibit-buttons-container">
+      <h2>Exhibit Pieces</h2>
+      <v-btn v-for="spot in exhibits" :key="spot._id">
+        {{ spot.exhibitName }}
+      </v-btn>
+    </div>
+  </v-card>
 </v-contain>
 </div>
-  </v-app>
+</v-app>
 </template>
 
 <script>
-import { RouterLink, useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
-import { usePiniaStorage } from "../store/index.js";
+import { useRouter } from "vue-router";
+import axios from "axios";
 
 export default {
   setup() {
     const isMobile = ref(false);
-
-    const piniaStorage = usePiniaStorage();
+    const tickets = ref([]);
+    const mini = ref(false);
+    const drawer = ref(false);
     const router = useRouter();
+    const exhibits = ref([]);
 
-    onMounted(() => {
-      const updateIsMobile = () => {
-        isMobile.value = window.innerWidth <= 480;
-        if (!isMobile.value) {
-          router.push({ name: "warning" });
-        }
-      };
+    const updateIsMobile = () => {
+      isMobile.value = window.innerWidth <= 480;
+      if (!isMobile.value) {
+        router.push({ name: "warning" });
+      }
+    };
 
+    onMounted(async () => {
       updateIsMobile();
+      getAllExhibits();
       window.addEventListener("resize", updateIsMobile);
-
+      try {
+        const response = await axios.get("/ticket/getAllTickets");
+        tickets.value = response.data;
+        console.log("Tickets fetched successfully:", tickets.value);
+      } catch (error) {
+        console.error("Error fetching tickets:", error);
+      }
       return () => {
         window.removeEventListener("resize", updateIsMobile);
       };
     });
 
+    const getAllExhibits = async () => {
+      try {
+        const response = await axios.get("/exhibit/getall");
+        exhibits.value = response.data;
+        console.log(exhibits.value);
+      } catch (error) {
+        console.error("Getting exhibits failed:", error);
+      }
+    };
+
+
+
     const logout = async () => {
-      await piniaStorage.clearAuthData();
+      // Implement your logout logic
       router.push({ name: "login" });
     };
 
+  const goToPayment = async (MuseumName, Price) => {
+      
+      router.push("payment/"+MuseumName+Price);
+    };
     return {
       isMobile,
+      tickets,
+      drawer,
       logout,
+      goToPayment,
+      getAllExhibits,
     };
   },
 };

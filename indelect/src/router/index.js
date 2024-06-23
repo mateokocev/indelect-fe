@@ -11,7 +11,6 @@ import Map from "../views/Map.vue";
 import WrongDev from "../views/WrongDev.vue";
 import CMSHome from "../views/CMSHome.vue";
 import NoAccessDev from "../views/NoAccessDev.vue";
-import TicketDetails from "../views/TicketDetails.vue";
 import TicketList from "../views/TicketList.vue";
 import Payment from "../views/Payment.vue";
 import Checkout from "../views/Checkout.vue";
@@ -74,11 +73,7 @@ const router = createRouter({
       name: "Map",
       component: Map,
     },
-    {
-      path: "/ticketdetails",
-      name: "ticketdetails",
-      component: TicketDetails,
-    },
+    
     {
       path: "/ticketlist",
       name: "ticketlist",
