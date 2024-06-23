@@ -1,188 +1,159 @@
-<template  pa-0 ma-0y>
- <v-app >
+<template>
+  <v-container v-if="!isMobile"></v-container>
+  <v-container style="margin: 0; padding: 0;" v-else>
+    <v-card>
+      <!-- NavBar -->
+      <div id="app">
+        <v-app id="inspire">
+          <v-app-bar
+            dense
+            clipped-left
+            color="#B02E0C"
+            app
+            :extended="extended"
+            dark
+            fixed
+            elevate-on-scroll
+          >
+            <v-app-bar-nav-icon
+              @click.stop="drawer = !drawer"
+              class="btn-fix"
+            ></v-app-bar-nav-icon>
+            <v-toolbar-title>Indelect</v-toolbar-title>
+          </v-app-bar>
+          <v-navigation-drawer
+            class="fixed-drawer"
+            width="250"
+            clipped
+            v-model="drawer"
+            :mini-variant.sync="mini"
+            app
+          >
+            <v-list-item class="px-2">
+              <v-list-item-title>Jim R</v-list-item-title>
+            </v-list-item>
+            <v-divider></v-divider>
+            <v-list dense>
+              <v-list-item link @click="goHome">
+                <v-list-item-icon>
+                  <v-icon>mdi-home</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Home</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item link @click="logout">
+                <v-list-item-icon>
+                  <v-icon>mdi-logout</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Log Out</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item v-for="item in items" :key="item.title" link>
+                <v-list-item-icon>
+                  <v-icon>{{ item.icon }}</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-navigation-drawer>
+          <!-- Page Content -->
+          <div class="mt-14"></div>
+          <v-container>
+            <v-card
+              class="mx-auto pa-2 pb-5"
+              elevation="-1"
+              max-width="700"
+              rounded="lg"
+              color="white"
+            >
+              <h1 class="text-h5 text-center mb-6 black-text">Available Tickets</h1>
+              <v-row>
+                <v-col v-for="ticket in tickets" :key="ticket.id" cols="12" md="6">
+                  
+                  <v-card class="ticket-card mx-auto mb-4" max-width="300">
+                   <v-card-title style="font-size: 5vw;">  Museum Name: {{ ticket.MuseumName }}</v-card-title>
+                   <h4 class="ma-1"> Museum Details: {{ ticket.MuseumDetails }}</h4>
+                   <v-btn class="ma-2" color="#EF866F" @click="goToPayment(ticket.MuseumName,ticket.Price)">Price: {{ ticket.Price }}</v-btn>
 
-<v-container v-if="!isMobile" >
-</v-container>
-<v-container style="margin: 0; padding: 0;" v-else>
-  
-  <v-card>
-    <v-layout>
-      <v-app-bar color="primary" prominent>
-        <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-
-        <v-toolbar-title>Welcome to Tickets Selection</v-toolbar-title>
-
-        <v-spacer></v-spacer>
-
-        <template v-if="$vuetify.display.mdAndUp">
-          <v-btn icon><v-icon>mdi-magnify</v-icon></v-btn>
-          <v-btn icon><v-icon>mdi-filter</v-icon></v-btn>
-        </template>
-
-        <!-- Home Button -->
-        <v-btn icon @click="goHome">
-          <v-icon>mdi-home</v-icon>
-        </v-btn>
-
-        <!-- Settings Button -->
-        <v-btn icon @click="goSettings">
-          <v-icon>mdi-settings</v-icon>
-        </v-btn>
-
-        <v-btn icon><v-icon>mdi-dots-vertical</v-icon></v-btn>
-      </v-app-bar>
-
-      <v-navigation-drawer v-model="drawer" :location="$vuetify.display.mobile ? 'bottom' : undefined" temporary>
-        <v-list :items="items"></v-list>
-      </v-navigation-drawer>
-
-      <v-main style="height: 500px;">
-        <v-card-text>
-          <!-- Your main content here -->
-        </v-card-text>
-      </v-main>
-    </v-layout>
-  </v-card>
-  <div>
-    <v-app>
-      <v-container>
-       
-
-        <v-card
-          class="mx-auto pa-12 pb-8"
-          elevation="0"
-          max-width="700"
-          rounded="lg"
-          color="white"
-        >
-          <h1 class="text-h5 text-center mb-6 black-text">Available Tickets</h1>
-          <v-row>
-            <v-col v-for="ticket in tickets" :key="ticket.id" cols="12" md="6">
-              <v-card class="ticket-card mx-auto mb-4" max-width="300">
-                <v-img
-                  :src="ticket.image"
-                  height="200px"
-                  class="white--text align-end"
-                ></v-img>
-                <v-card-title class="black-text">
-                  <router-link>
-                    {{ ticket.name }}
-                  </router-link>
-                </v-card-title>
-                <v-card-subtitle class="black-text">{{ ticket.info }}</v-card-subtitle>
-                <v-card-subtitle class="black-text">Price: ${{ ticket.price }}</v-card-subtitle>
-                <v-card-actions>
-                  <router-link :to="'/ticket/' + ticket.id">
-                    <v-btn color="primary">View Details</v-btn>
-                  </router-link>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-container>
-    </v-app>
-  </div>
-</v-container>
-
- </v-app>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-container>
+        </v-app>
+      </div>
+    </v-card>
+  </v-container>
 </template>
 
-
 <script>
-import { RouterLink, useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
-import { usePiniaStorage } from "../store/index.js";
-import qrcode from "qrcode";
+import { useRouter } from "vue-router";
 import axios from "axios";
 
 export default {
-
-   setup() {
+  setup() {
     const isMobile = ref(false);
-
-    const piniaStorage = usePiniaStorage();
+    const tickets = ref([]);
+    const mini = ref(false);
+    const drawer = ref(false);
     const router = useRouter();
 
-    onMounted(async () => {
-      const updateIsMobile = () => {
-        isMobile.value = window.innerWidth <= 480;
-        if (!isMobile.value) {
-          router.push({ name: "warning" });
-        }
-      };
-
-      updateIsMobile();
-      window.addEventListener("resize", updateIsMobile);
-      //----------------------------
-
-      const tickets = await fetchAllTickets();
-      console.log(tickets);
-      //----------------------
-      return () => {
-        window.removeEventListener("resize", updateIsMobile);
-      };
-      
-
-
-     
-    });
-
-    const logout = async () => {
-      await piniaStorage.clearAuthData();
-      router.push({ name: "login" });
-    };
-
-    const fetchAllTickets = async () => {
-      try {
-        const response = await axios.get("/ticket/getAllTickets"); 
-        console.log("Tickets fetched successfully:", response.data);
-        return response.data;
-      } catch (error) {
-        console.error("Error fetching tickets:", error);
-        return [];
+    const updateIsMobile = () => {
+      isMobile.value = window.innerWidth <= 480;
+      if (!isMobile.value) {
+        router.push({ name: "warning" });
       }
     };
 
-    const generateQRCodesForAllTickets = async (email) => {
-  try {
-    email="ovojetest@gmail.com"
-    const tickets = await Ticket.find({});
-    for (const ticket of tickets) {
-      await generateUniqueQRCode(ticket, email);
-    }
-  } catch (error) {
-    console.error("Error fetching tickets:", error);
-  } finally {
-    mongoose.connection.close();
-  }
-};
+    onMounted(async () => {
+      updateIsMobile();
+      window.addEventListener("resize", updateIsMobile);
+      try {
+        const response = await axios.get("/ticket/getAllTickets");
+        tickets.value = response.data;
+        console.log("Tickets fetched successfully:", tickets.value);
+      } catch (error) {
+        console.error("Error fetching tickets:", error);
+      }
+      return () => {
+        window.removeEventListener("resize", updateIsMobile);
+      };
+    });
 
-    const hello = () => {
 
-      return "hello" 
+
+    const goHome = () => {
+      router.push({ name: "home" });
     };
 
+    const logout = async () => {
+      // Implement your logout logic
+      router.push({ name: "login" });
+    };
 
-
+  const goToPayment = async (MuseumName, Price) => {
+      
+      router.push("payment/"+MuseumName+Price);
+    };
     return {
       isMobile,
+      tickets,
+      drawer,
+      goHome,
       logout,
+      goToPayment,
     };
-
-
   },
-
-
-
-
-
 };
 </script>
 
-
 <style scoped>
-/* You can add scoped styles here if needed */
 .text-decoration-none {
   text-decoration: none;
 }
@@ -192,13 +163,36 @@ export default {
 }
 
 .ticket-card:hover {
-  background-color: #FFB6C1;
+  background-color: #ffb6c1;
 }
 
-/* New class for black text color */
 .black-text {
   color: black;
 }
 
+.fixed-drawer {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  height: calc(100% - 64px);
+  z-index: 1000;
+  overflow-y: auto;
+}
 
+.content-container {
+  margin-left: 310px;
+  padding: 16px;
+}
+
+.v-app-bar {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.v-main {
+  padding-top: 0px;
+}
 </style>

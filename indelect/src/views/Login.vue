@@ -160,6 +160,7 @@
           Log In
         </v-btn>
 
+        
         <v-card-text class="text-center">
           <router-link
             to="/signup"
@@ -225,41 +226,46 @@ export default {
     };
 
     const login = async () => {
-      showError.value = false;
-      showEmpty.value = false;
+  showError.value = false;
+  showEmpty.value = false;
 
-      if (!email.value || !password.value) {
-        console.error("All fields are required");
-        showEmpty.value = true;
-        return;
-      }
+  if (!email.value || !password.value) {
+    console.error("All fields are required");
+    showEmpty.value = true;
+    return;
+  }
 
-      isLoading.value = true;
+  isLoading.value = true;
 
-      try {
-        const hashedPassword = await hashPassword(password.value);
+  try {
+    const hashedPassword = await hashPassword(password.value);
 
-        const response = await axios.post("/login", {
-          email: email.value,
-          password: hashedPassword,
-        });
+    const response = await axios.post("/login", {
+      email: email.value,
+      password: hashedPassword,
+    });
 
-        console.log("Login successful:", response.data);
-        localStorage.setItem("token", response.data.token)
-        localStorage.setItem("isAdmin", response.data.isAdmin)
-        piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
+    console.log("Login successful:", response.data);
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("isAdmin", response.data.isAdmin);
+    localStorage.setItem("userEmail", email.value); // Save email address locally
+    piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
 
-        if(piniaStorage.getAdmin && isMobile.value) { router.push({ name: 'warning' }); }
-        else if(!piniaStorage.getAdmin && !isMobile.value) { router.push({ name: 'warning' }); }
-        else if(piniaStorage.getAdmin && !isMobile.value) { router.push({ name: 'cmshome' }); }
-        
-      } catch (error) {
-        console.error("Login failed:", error);
-        showError.value = true;
-      } finally {
-        isLoading.value = false;
-      }
-    };
+    if (piniaStorage.getAdmin && isMobile.value) {
+      router.push({ name: 'warning' });
+    } else if (!piniaStorage.getAdmin && !isMobile.value) {
+      router.push({ name: 'warning' });
+    } else if (piniaStorage.getAdmin && !isMobile.value) {
+      router.push({ name: 'cmshome' });
+    }
+
+  } catch (error) {
+    console.error("Login failed:", error);
+    showError.value = true;
+  } finally {
+    isLoading.value = false;
+  }
+};
 
     return {
       isMobile,
