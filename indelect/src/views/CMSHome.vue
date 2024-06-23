@@ -61,16 +61,53 @@
                   color="#EB4511"
                   density="compact"
                 ></v-checkbox>
+
+                <v-checkbox
+                  class="ml-6"
+                  v-model="artExhibits"
+                  :ripple="false"
+                  label="Art museum exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
+
+                <v-checkbox
+                  class="ml-6"
+                  v-model="scienceExhibits"
+                  :ripple="false"
+                  label="Science museum exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
+
+                <v-checkbox
+                  class="ml-6"
+                  v-model="historyExhibits"
+                  :ripple="false"
+                  label="History museum exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
+
+                <v-checkbox
+                  class="ml-6"
+                  v-model="techExhibits"
+                  :ripple="false"
+                  label="Tech museum exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
                 <div class="horizontal-filter-title-separator"></div>
 
                 
                 <v-toolbar color="white">
+                  <v-spacer></v-spacer>
                   <v-card-actions>
-                    <v-btn class="justify-center" color="secondary" @click="isActive.value = false">
+                    <v-btn color="secondary" @click="isActive.value = false">
                       Close
                     </v-btn>
                   </v-card-actions>
-
+                  <v-spacer></v-spacer>
                 </v-toolbar>
               </v-card>
             </template>
@@ -160,6 +197,27 @@
                       multiple
                     ></v-file-input>
                     <v-card-text class="ml-14 text-red text-caption">Warning: The images will be overwritten upon the selection of new ones</v-card-text>
+
+                    <v-menu>
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          color="white"
+                          class="new-name-bar mt-4 ml-10"
+                        >
+                          {{ exhibitToMuseum || 'Select Museum' }}
+                        </v-btn>
+                      </template>
+                      <v-list>
+                        <v-list-item
+                          v-for="(item, index) in museumOptions"
+                          :key="index"
+                          @click="selectModifyExhibitMuseum(item)"
+                        >
+                          <v-list-item-title>{{ item }}</v-list-item-title>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
 
                     <v-checkbox
                       v-model="exhibitDisplayed"
@@ -285,6 +343,28 @@
                       multiple
                     ></v-file-input>
 
+                    <v-menu>
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          color="white"
+                          class="new-name-bar mt-4 ml-10"
+                        >
+                          {{ newToMuseum || 'Select Museum' }}
+                        </v-btn>
+                      </template>
+
+                      <v-list>
+                        <v-list-item
+                          v-for="(item, index) in museumOptions"
+                          :key="index"
+                          @click="selectMuseum(item)"
+                        >
+                          <v-list-item-title>{{ item }}</v-list-item-title>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+
                     <v-checkbox
                       v-model="newDisplayed"
                       class="ml-10 top-checkbox-top-margin"
@@ -356,7 +436,11 @@ export default {
   data() {
     return {
       displayedExhibits: ref(true),
-      hiddenExhibits: ref(true)
+      hiddenExhibits: ref(true),
+      artExhibits: ref(true),
+      scienceExhibits: ref(true),
+      historyExhibits: ref(true),
+      techExhibits: ref(true),
     }
   },
 
@@ -366,6 +450,10 @@ export default {
     const isActive = ref(false);
     const displayedExhibits = ref(true);
     const hiddenExhibits = ref(true);
+    const artExhibits = ref(true);
+    const scienceExhibits = ref(true);
+    const historyExhibits = ref(true);
+    const techExhibits = ref(true);
     const search = ref("");
 
     // novi exhibiti
@@ -374,7 +462,10 @@ export default {
     const base64Files = ref([]);
     const orderattachment = ref([]);
     const newDisplayed = ref(false);
+    const newToMuseum = ref("");
     const showError = ref(false);
+    const menu = ref(false);
+    const museumOptions = ["art", "science", "history", "technology"];
 
     // postojeci exhibiti
     const exhibits = ref([]);
@@ -383,6 +474,7 @@ export default {
     const exhibitImages = ref([]);
     const exhibitDisplayed = ref(false);
     const exhibitID = ref("");
+    const exhibitToMuseum = ref("");
 
     const piniaStorage = usePiniaStorage();
     const router = useRouter();
@@ -422,6 +514,7 @@ export default {
       newDisplayed.value = false;
       base64Files.value = [];
       showError.value = false;
+      newToMuseum.value = "";
     };
 
     const printBase = async () => {
@@ -444,15 +537,38 @@ export default {
       });
     });
 
+    const selectMuseum = (item) => {
+      newToMuseum.value = item;
+      menu.value = false;
+    };
+
+    const selectModifyExhibitMuseum = (item) => {
+      exhibitToMuseum.value = item;
+      menu.value = false;
+    };
+
     const filteredExhibits = computed(() => {
       let filtered = exhibits.value;
 
-      if (displayedExhibits.value && !hiddenExhibits.value) {
-        filtered = filtered.filter(exhibit => exhibit.isDisplayed);
-      } else if (!displayedExhibits.value && hiddenExhibits.value) {
+      if (!displayedExhibits.value && hiddenExhibits.value) {
         filtered = filtered.filter(exhibit => !exhibit.isDisplayed);
+      } else if (displayedExhibits.value && !hiddenExhibits.value) {
+        filtered = filtered.filter(exhibit => exhibit.isDisplayed);
       } else if (!displayedExhibits.value && !hiddenExhibits.value) {
         return [];
+      }
+
+      if (!artExhibits.value) {
+        filtered = filtered.filter(exhibit => exhibit.toMuseum !== 'art');
+      }
+      if (!scienceExhibits.value) {
+        filtered = filtered.filter(exhibit => exhibit.toMuseum !== 'science');
+      }
+      if (!historyExhibits.value) {
+        filtered = filtered.filter(exhibit => exhibit.toMuseum !== 'history');
+      }
+      if (!techExhibits.value) {
+        filtered = filtered.filter(exhibit => exhibit.toMuseum !== 'technology');
       }
 
       if (search.value) {
@@ -469,15 +585,14 @@ export default {
 //       POZIV RUTA
 // 
 // 
-
-
     const newExhibit = async () => {
       showError.value = false;
 
       if (
         !newTitle.value ||
         !newDescription.value ||
-        !base64Files.value
+        !base64Files.value ||
+        !newToMuseum.value
       ) {
         console.error("All fields are required");
         showError.value = true;
@@ -488,7 +603,8 @@ export default {
           exhibitName: newTitle.value,
           description: newDescription.value,
           images: base64Files.value,
-          isDisplayed: newDisplayed.value
+          isDisplayed: newDisplayed.value,
+          toMuseum: newToMuseum.value,
         });
 
         onClosedDialogReset();
@@ -516,13 +632,14 @@ export default {
       exhibitDescription.value = exhibit.description;
       exhibitImages.value = exhibit.images;
       exhibitDisplayed.value = exhibit.isDisplayed;
+      exhibitToMuseum.value = exhibit.toMuseum;
       exhibitID.value = exhibit._id;
     };
 
     const updateExhibit = async () => {
       showError.value = false;
 
-      if (!exhibitID.value || !exhibitTitle.value || !exhibitDescription.value) {
+      if (!exhibitID.value || !exhibitTitle.value || !exhibitDescription.value || !exhibitToMuseum.value) {
         console.error("All fields are required");
         showError.value = true;
       }
@@ -532,6 +649,7 @@ export default {
         description: exhibitDescription.value,
         images: base64Files.value,
         isDisplayed: exhibitDisplayed.value,
+        toMuseum: exhibitToMuseum.value
       };
       console.log('Sending update request with data:', { id: exhibitID.value, updateData });
 
@@ -571,6 +689,10 @@ export default {
       isMobile,
       displayedExhibits,
       hiddenExhibits,
+      artExhibits,
+      scienceExhibits,
+      historyExhibits,
+      techExhibits,
       exhibits,
       filteredExhibits,
       rules,
@@ -580,6 +702,10 @@ export default {
       base64Files,
       orderattachment,
       newDisplayed,
+      newToMuseum,
+      menu,
+      museumOptions,
+      selectMuseum,
       newExhibit,
       watch,
       printBase,
@@ -590,6 +716,8 @@ export default {
       exhibitDescription,
       exhibitImages,
       exhibitDisplayed,
+      exhibitToMuseum,
+      selectModifyExhibitMuseum,
       loadExhibitData,
       updateExhibit,
       deleteExhibit,
