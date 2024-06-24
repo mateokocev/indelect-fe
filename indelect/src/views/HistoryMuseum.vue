@@ -42,10 +42,10 @@
 
   <v-card>
     <div>
-      <h1 class="mt-15">Welcome to the Science Museum Map</h1>
+      <h1 class="mt-15">Welcome to the History Museum Map</h1>
       <div class="map-container">
         <!-- Map Image (You can replace the image URL with your own map) -->
-        <img src="../assets/mapa1.png" alt="Museum Map" class="map-image" >
+        <img src="../assets/mapa2.png" alt="Museum Map" class="map-image" >
         <!-- Hotspots -->
          <div v-for="(exhibit, index) in exhibits"
          :key="exhibit._id" > 

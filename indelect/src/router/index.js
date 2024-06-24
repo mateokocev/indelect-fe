@@ -14,6 +14,10 @@ import NoAccessDev from "../views/NoAccessDev.vue";
 import TicketList from "../views/TicketList.vue";
 import Payment from "../views/Payment.vue";
 import Checkout from "../views/Checkout.vue";
+import Science from "../views/ScienceMuseum.vue";
+import Art from "../views/ArtMuseum.vue";
+import HistoryMuseum from "../views/HistoryMuseum.vue";
+import Tech from "../views/TechnologyMuseum.vue";
 
 
 
@@ -72,6 +76,26 @@ const router = createRouter({
       path: "/map",
       name: "Map",
       component: Map,
+    },
+    {
+      path: "/map/Science Museum",
+      name: "Science Museum",
+      component: Science ,
+    },
+    {
+      path: "/map/Art Museum",
+      name: "Art Museum",
+      component: Art ,
+    },
+    {
+      path: "/map/History Museum",
+      name: "History Museum",
+      component: HistoryMuseum ,
+    },
+    {
+      path: "/map/Technology Museum",
+      name: "Technology Museum",
+      component: Tech ,
     },
     
     {

@@ -20,7 +20,7 @@
       app
     >
       <v-list-item class="px-2">
-        <v-list-item-title>Jim R</v-list-item-title>
+        <v-list-item-title>{{  userName }}</v-list-item-title>
       </v-list-item>
       <v-divider></v-divider>
       <v-list dense>          
@@ -62,7 +62,11 @@
             v-model="paymentDetails.cvc"
             required
           ></v-text-field>
-          <v-btn type="submit" class="pay-button" color="primary" @click="this.getQrCode()">Pay Now</v-btn>
+          <v-btn type="submit" :disabled="paymentDetails.cvc == '' " class="pay-button"  color="primary" @click="this.getQrCode()">Pay Now</v-btn>
+   <h3>your qr code</h3>
+       <v-img :src="nasQrKod"></v-img>
+          <v-btn  type="submit" class="pay-button mt-3" color="primary" @click="this.usporedi(nasQrKod)">Usporedi</v-btn>
+
         </v-form>
       </v-container>
     </v-main>
@@ -76,46 +80,14 @@ import axios from "axios";
 
 export default {
   name: 'Payment',
-  methods: {
-    async getQrCode() {
-      try {
-        const mail = localStorage.getItem("userEmail");
-        const museumName = this.$route.params.MuseumName.slice(0, -2);
-        const params = new URLSearchParams({ mail: mail, museumName: museumName });
-        const response = await axios.get(`/ticket/getQrCode?${params.toString()}`);
-        console.log("QR Code data:", response.data);
-        this.usporedi(response.data)
-      } catch (error) {
-        console.error("Failed to fetch QR Code data:", error);
-      }
-    },
-
-
-   async usporedi(nasQrCode)
-    {
-
-    // usporedi response odozgo sa podatkom iz monga
-
-    // napravit rutu na bacekendu 
-    //slati sa frontenda qr code na tu rutu na backendu 
-        // na backendu usporediti ta dva podatka
-
-        const response = await axios.get(`/usporedi/?${nasQrCode}`);
-        if(response.data)
-        {
-          router.push({ name: this.museumName });
-        }
-
-    }
-  },
 
   setup() {
     const router = useRouter();
+    const drawer = ref(false);
+    const userName = ref(null);
     const isMobile = ref(false);
     const tickets = ref([]);
-    const mini = ref(false);
-    const drawer = ref(false);
-
+    let nasQrKod = ref(null);
     const paymentDetails = ref({
       cardNumber: '',
       expiryDate: '',
@@ -144,8 +116,51 @@ export default {
       }
     };
 
+    const getUsername = async () => {
+      try {
+        const userEmail = localStorage.getItem("userEmail");
+        const response = await axios.get(`/GetUserName?email=${userEmail}`);
+        userName.value = response.data.username;
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    const getQrCode = async () => {
+      try {
+        const mail = localStorage.getItem("userEmail");
+        const museumName = router.currentRoute.value.params.MuseumName.slice(0, -2);
+        const params = new URLSearchParams({ mail: mail, museumName: museumName });
+        const response = await axios.get(`/ticket/getQrCode?${params.toString()}`);
+        if(response.data){
+          console.log("QR Code data:", response.data);
+          nasQrKod.value = response.data;
+        }
+      else{
+        alert("already bought card");
+      }
+      } 
+      catch (error) {
+        console.error("Failed to fetch QR Code data:", error);
+      }
+    };
+
+    const usporedi = async (nasQrCode) => {
+      try {
+        const response = await axios.get(`/usporedi/?${nasQrCode}`);
+        console.log(response.data)
+        if (response.data) {
+
+           router.push({ name: router.currentRoute.value.params.MuseumName.slice(0, -2) });
+        }
+      } catch (error) {
+        console.error("Comparison failed:", error);
+      }
+    };
+
     onMounted(async () => {
       updateIsMobile();
+      await getUsername();
       window.addEventListener("resize", updateIsMobile);
       try {
         const response = await axios.get("/ticket/getAllTickets");
@@ -157,11 +172,7 @@ export default {
       return () => {
         window.removeEventListener("resize", updateIsMobile);
       };
-
-      
     });
-
-    
 
     const logout = async () => {
       // Implement your logout logic
@@ -169,7 +180,7 @@ export default {
     };
 
     const processPayment = async () => {
-    
+      // Implement your payment processing logic
     };
 
     return {
@@ -182,10 +193,24 @@ export default {
       drawer,
       logout,
       processPayment,
+      getQrCode,
+      userName,
+      usporedi,
+      nasQrKod,
     };
+  },
+
+  computed: {
+    museumName() {
+      return this.$route.params.MuseumName.slice(0, -2);
+    },
+    price() {
+      return this.$route.params.MuseumName.slice(-2);
+    }
   },
 };
 </script>
+
 
 <style scoped>
 .payment-container {
