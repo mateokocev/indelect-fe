@@ -97,9 +97,9 @@
                   color="#EB4511"
                   density="compact"
                 ></v-checkbox>
+
                 <div class="horizontal-filter-title-separator"></div>
 
-                
                 <v-toolbar color="white">
                   <v-spacer></v-spacer>
                   <v-card-actions>
@@ -570,6 +570,7 @@ export default {
       if (!techExhibits.value) {
         filtered = filtered.filter(exhibit => exhibit.toMuseum !== 'technology');
       }
+
 
       if (search.value) {
         const query = search.value.toLowerCase();

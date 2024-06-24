@@ -49,7 +49,30 @@
             class="mb-7"
           ></v-text-field>
 
-          <router-link to="/" class="no-underline">
+          <v-card
+          v-if="showError"
+          class="mx-auto pa-2 mb-14"
+          elevation="2"
+          max-width="400"
+          rounded="lg"
+          color="#e89c9c"
+        >
+          <v-card-text>
+            Register failed. Unspecified error.
+          </v-card-text>
+        </v-card>
+
+        <v-card
+          v-if="showEmpty"
+          class="mx-auto pa-2 mb-12"
+          elevation="2"
+          max-width="400"
+          rounded="lg"
+          color="#e89c9c"
+        >
+          <v-card-text> Register failed. Missing arguments. </v-card-text>
+        </v-card>
+
             <v-btn
               block
               class="mb-8"
@@ -67,7 +90,6 @@
                 ></v-progress-circular>
               </template>
             </v-btn>
-          </router-link>
 
           <v-card-text class="text-center">
             <router-link to="/" class="text-black text-decoration-underline">
@@ -126,7 +148,31 @@
             class="mb-7"
           ></v-text-field>
 
-          <router-link to="/" class="no-underline">
+          <v-card
+          v-if="showError"
+          class="mx-auto pa-2 mb-12"
+          elevation="2"
+          max-width="400"
+          rounded="lg"
+          color="#e89c9c"
+          >
+            <v-card-text>
+              Register failed. Unspecified error.
+            </v-card-text>
+          </v-card>
+
+          <v-card
+            v-if="showEmpty"
+            class="mx-auto pa-2 mb-12"
+            elevation="2"
+            max-width="400"
+            rounded="lg"
+            color="#e89c9c"
+          >
+            <v-card-text> Register failed. Missing arguments. </v-card-text>
+          </v-card>
+
+
             <v-btn
               block
               class="mb-6"
@@ -144,7 +190,6 @@
                 ></v-progress-circular>
               </template>
             </v-btn>
-          </router-link>
 
           <v-card-text class="text-center">
             <router-link to="/" class="text-black text-decoration-underline">
@@ -169,6 +214,8 @@ export default {
     const username = ref("");
     const visible = ref(false);
     const isLoading = ref(false);
+    const showEmpty = ref(false);
+    const showError = ref(false);
 
     onMounted(() => {
       const updateIsMobile = () => {
@@ -205,12 +252,17 @@ export default {
     };
 
     const register = async () => {
+      showError.value = false;
+      showEmpty.value = false;
+
       if (!username.value || !email.value || !password.value) {
         console.error("All fields are required");
+        showEmpty.value = true;
         return;
       }
 
       isLoading.value = true;
+
       try {
         const hashedPassword = await hashPassword(password.value);
         const response = await axios.post("/register", {
@@ -221,6 +273,7 @@ export default {
         console.log("Registration successful:", response.data);
       } catch (error) {
         console.error("Registration failed. Wompy Dompy:", error);
+        showError.value = true;
       } finally {
         isLoading.value = false;
       }
@@ -235,6 +288,8 @@ export default {
       isLoading,
       rules,
       register,
+      showEmpty,
+      showError,
     };
   },
 };
