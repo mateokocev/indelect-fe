@@ -249,6 +249,7 @@ export default {
     localStorage.setItem("token", response.data.token);
     localStorage.setItem("isAdmin", response.data.isAdmin);
     localStorage.setItem("userEmail", email.value); // Save email address locally
+    localStorage.setItem("User", email.value);
     piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
 
     if (piniaStorage.getAdmin && isMobile.value) {

@@ -30,7 +30,7 @@
             app
           >
             <v-list-item class="px-2">
-              <v-list-item-title>Jim R</v-list-item-title>
+              <v-list-item-title>{{ userName }}</v-list-item-title>
             </v-list-item>
             <v-divider></v-divider>
             <v-list dense>
@@ -96,6 +96,8 @@ export default {
     const mini = ref(false);
     const drawer = ref(false);
     const router = useRouter();
+    const userName = ref(null);
+
 
     const updateIsMobile = () => {
       isMobile.value = window.innerWidth <= 480;
@@ -106,6 +108,7 @@ export default {
 
     onMounted(async () => {
       updateIsMobile();
+      await getUsername();
       window.addEventListener("resize", updateIsMobile);
       try {
         const response = await axios.get("/ticket/getAllTickets");
@@ -119,6 +122,16 @@ export default {
       };
     });
 
+
+    const getUsername = async () => {
+      try {
+        const userEmail = localStorage.getItem("userEmail");
+        const response = await axios.get(`/GetUserName?email=${userEmail}`);
+        userName.value = response.data.username;
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
 
 
    
@@ -138,6 +151,7 @@ export default {
       drawer,
       logout,
       goToPayment,
+      userName,
     };
   },
 };
