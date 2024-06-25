@@ -204,6 +204,7 @@
 
 <script>
 import { ref, onMounted } from "vue";
+import { RouterLink, useRouter } from "vue-router";
 import axios from "axios";
 
 export default {
@@ -216,6 +217,8 @@ export default {
     const isLoading = ref(false);
     const showEmpty = ref(false);
     const showError = ref(false);
+
+    const router = useRouter();
 
     onMounted(() => {
       const updateIsMobile = () => {
@@ -271,6 +274,7 @@ export default {
           password: hashedPassword,
         });
         console.log("Registration successful:", response.data);
+        router.push({ name: 'login' });
       } catch (error) {
         console.error("Registration failed. Wompy Dompy:", error);
         showError.value = true;
