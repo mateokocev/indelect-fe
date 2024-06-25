@@ -1,84 +1,133 @@
 <template>
   <v-app>
-<div>
-<v-container v-if="!isMobile" ></v-container>
+    <!-- Navigation and App Bar -->
+    <v-container>
+      <v-app-bar
+        dense
+        clipped-left
+        color="#B02E0C"
+        app
+        dark
+        fixed
+        elevate-on-scroll
+      >
+        <v-app-bar-nav-icon
+          @click.stop="drawer = !drawer"
+          class="btn-fix"
+        ></v-app-bar-nav-icon>
+        <v-toolbar-title>Indelect</v-toolbar-title>
+      </v-app-bar>
 
-<v-contain v-else>
-  <v-app-bar
-    dense
-    clipped-left
-    color="#B02E0C"
-    app
-    dark
-    fixed
-    elevate-on-scroll
-  >
-    <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="btn-fix"></v-app-bar-nav-icon>
-    <v-toolbar-title>Indelect</v-toolbar-title>
-  </v-app-bar>
+      <!-- Navigation Drawer -->
+      <v-navigation-drawer
+        class="fixed-drawer"
+        width="250"
+        v-model="drawer"
+        app
+      >
+        <v-list-item class="px-2">
+          <v-list-item-title>{{ userName }}</v-list-item-title>
+        </v-list-item>
+        <v-divider></v-divider>
+        <v-list dense>
+          <v-list-item link @click="logout">
+            <v-list-item-icon>
+              <v-icon>mdi-logout</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Log Out</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-divider></v-divider>
+        </v-list>
+      </v-navigation-drawer>
+    </v-container>
 
-  <v-navigation-drawer
-    class="fixed-drawer"
-    width="250"
-    v-model="drawer"
-    app
-  >
-    <v-list-item class="px-2">
-      <v-list-item-title>{{  userName }}</v-list-item-title>
-    </v-list-item>
-    <v-divider></v-divider>
-    <v-list dense>
-      <v-list-item link @click="logout">
-        <v-list-item-icon>
-          <v-icon>mdi-logout</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>Log Out</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <v-divider></v-divider>
-    </v-list>
-  </v-navigation-drawer>
-
-  <v-card>
-    <div>
-      <h1 class="mt-15">Welcome to the Science Museum Map</h1>
-      <div class="map-container">
-        <!-- Map Image (You can replace the image URL with your own map) -->
-        <img src="../assets/mapa1.png" alt="Museum Map" class="map-image" >
-        <!-- Hotspots -->
-         <div v-for="(exhibit, index) in exhibits"
-         :key="exhibit._id" > 
-          <v-btn class="hotspot-button">
-          {{ exhibit.exhibitName }}
-        </v-btn>
-      </div>
-       
-      </div>
-      <!-- Exhibition Item Details -->
-      <div v-if="selectedItem" class="exhibition-details">
-        <h2>Exhibition Item Details</h2>
+    <!-- Main Content -->
+    <v-container>
+      <v-card>
         <div>
-          <p>ID: {{ selectedItem.id }}</p>
-          <p>Name: {{ selectedItem.name }}</p>
-          <!-- Add more details as needed -->
-        </div>
-      </div>
-    </div>
-  </v-card>
+          <h1 class="mt-15">Welcome to the Science Museum Map</h1>
+          <div class="map-container">
+            <!-- Museum Map Image -->
+            <img src="../assets/mapa1.png" alt="Museum Map" class="map-image" />
+          </div>
 
-  <!-- New container for exhibit buttons -->
-  <v-card>
-    <div class="exhibit-buttons-container">
-      <h2>Exhibit Pieces</h2>
-      <v-btn v-for="spot in exhibits" :key="spot._id">
-        {{ spot.exhibitName }}
-      </v-btn>
-    </div>
-  </v-card>
-</v-contain>
-</div>
-</v-app>
+          
+
+          <!-- Exhibition Item Details (shown when an exhibit is clicked) -->
+          <div v-if="selectedItem" class="exhibition-details">
+            <h2>Exhibition Item Details</h2>
+            <div>
+              <p>ID: {{ selectedItem._id }}</p>
+              <p>Name: {{ selectedItem.exhibitName }}</p>
+            </div>
+
+            <!-- Buttons for additional actions -->
+            <div class="button-container">
+              <v-btn color="primary" @click="handleAction1()">Action 1</v-btn>
+              <v-btn color="secondary" @click="handleAction2()">Action 2</v-btn>
+            </div>
+          </div>
+        </div>
+      </v-card>
+
+      <!-- Optional: Exhibit Buttons Container (can be used for additional UI) -->
+      <v-card>
+        <div class="exhibit-buttons-container">
+          <h2>Exhibit Pieces</h2>
+          <v-btn @click="openDialog">Show Science Museum Images</v-btn>
+          <v-btn>2</v-btn>
+        </div>
+      </v-card>
+
+      <v-dialog max-width="500">
+        <template v-slot:activator="{ props: activatorProps }">
+          <v-btn
+            v-bind="activatorProps"
+            color="surface-variant"
+            text="Open Dialog"
+            variant="flat"
+          ></v-btn>
+        </template>
+
+        <template v-slot:default="{ isActive }">
+          <v-card title="Dialog">
+            <v-card>
+              <v-card-title>
+                <span class="headline">Science Museum Images</span>
+              </v-card-title>
+              <v-card-text>
+                  <div
+                    v-for="(image, index) in scienceImages"
+                    :key="index"
+                  >
+                    <v-img :src="image"></v-img>
+                  </div>
+
+                  {{ scienceImages }}
+
+              </v-card-text>
+
+            </v-card>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+
+              <v-btn
+                text="Close Dialog"
+                @click="isActive.value = false"
+              ></v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
+
+      
+
+    
+    </v-container>
+  </v-app>
 </template>
 
 <script>
@@ -87,6 +136,13 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 
 export default {
+
+  data() {
+    return {
+      scienceImages: ref([])
+    }
+  },
+
   setup() {
     const isMobile = ref(false);
     const tickets = ref([]);
@@ -95,6 +151,8 @@ export default {
     const userName = ref(null);
     const router = useRouter();
     const exhibits = ref([]);
+    const selectedItem = ref(null);
+    const scienceImages = ref([]);
 
     const updateIsMobile = () => {
       isMobile.value = window.innerWidth <= 480;
@@ -106,6 +164,8 @@ export default {
     onMounted(async () => {
       updateIsMobile();
       getAllExhibits();
+      openDialog();
+
       await getUsername();
       window.addEventListener("resize", updateIsMobile);
       try {
@@ -124,32 +184,41 @@ export default {
       try {
         const response = await axios.get("/exhibit/getall");
         exhibits.value = response.data;
+
         console.log(exhibits.value);
       } catch (error) {
         console.error("Getting exhibits failed:", error);
       }
     };
 
+    const openDialog = () => {
+      const scienceImagesTemp = exhibits.value.flatMap((exhibit) =>
+        exhibit.toMuseum === "science" ? exhibit.images : []
+      );
+      scienceImages.value = scienceImagesTemp;
+      console.log(scienceImages.value)
+    };
 
     const getUsername = async () => {
-    try {
-      const userEmail = localStorage.getItem("userEmail");
-      const response = await axios.get(`/GetUserName?email=${userEmail}`);
-      userName.value = response.data.username;
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
+      try {
+        const userEmail = localStorage.getItem("userEmail");
+        const response = await axios.get(`/GetUserName?email=${userEmail}`);
+        userName.value = response.data.username;
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    const showExhibitDetails = (exhibit) => {
+      selectedItem.value = exhibit;
+    };
 
     const logout = async () => {
       // Implement your logout logic
       router.push({ name: "login" });
     };
 
-  const goToPayment = async (MuseumName, Price) => {
-      
-      router.push("payment/"+MuseumName+Price);
+    const goToPayment = async (MuseumName, Price) => {
+      router.push("payment/" + MuseumName + Price);
     };
     return {
       isMobile,
@@ -159,6 +228,8 @@ export default {
       goToPayment,
       getAllExhibits,
       userName,
+      showExhibitDetails,
+      openDialog,
     };
   },
 };
