@@ -47,11 +47,8 @@
         <!-- Map Image (You can replace the image URL with your own map) -->
         <img src="../assets/mapa2.png" alt="Museum Map" class="map-image" >
         <!-- Hotspots -->
-         <div v-for="(exhibit, index) in exhibits"
-         :key="exhibit._id" > 
-          <v-btn class="hotspot-button">
-          {{ exhibit.exhibitName }}
-        </v-btn>
+        <div v-for="(exhibit, index) in exhibits" :key="exhibit._id">
+        <img :src="exhibit.images[0]" alt="Exhibit Image" class="hotspot-button">
       </div>
        
       </div>
@@ -70,9 +67,10 @@
   <!-- New container for exhibit buttons -->
   <v-card>
     <div class="exhibit-buttons-container">
-      <h2>Exhibit Pieces</h2>
+      <h2>Exhibit pieces</h2>
+<h3></h3>
       <v-btn v-for="spot in exhibits" :key="spot._id">
-        {{ spot.exhibitName }}
+        {{ }}
       </v-btn>
     </div>
   </v-card>
@@ -124,12 +122,10 @@ export default {
       try {
         const response = await axios.get("/exhibit/getall");
         exhibits.value = response.data;
-        console.log(exhibits.value);
       } catch (error) {
-        console.error("Getting exhibits failed:", error);
+        console.error("Error fetching exhibits:", error);
       }
     };
-
 
     const getUsername = async () => {
     try {
@@ -159,6 +155,7 @@ export default {
       goToPayment,
       getAllExhibits,
       userName,
+      exhibits
     };
   },
 };
