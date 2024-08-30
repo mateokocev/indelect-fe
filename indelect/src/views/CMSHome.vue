@@ -125,25 +125,25 @@
             <v-icon>mdi-logout-variant</v-icon>
           </v-btn>
         </v-app-bar>
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
         <!-- Exhibit buttons -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
         <v-container
           class="mt-16 mb-3"
           style="padding: 16px 2px; margin-left: 0px"
         >
           <v-row>
             <v-col
-            v-for="(exhibit, index) in filteredExhibits"
-            :key="exhibit._id"
-            class="d-flex align-center justify-center"
-            cols="2"
+              v-for="(exhibit, index) in filteredExhibits"
+              :key="exhibit._id"
+              class="d-flex align-center justify-center"
+              cols="2"
             >
               <v-dialog max-width="800" persistent>
                 <template v-slot:activator="{ props: openEditExistingWindow }">
@@ -158,15 +158,19 @@
                     :style="{
                       backgroundImage: `url(${exhibit.images[0]})`,
                       backgroundSize: 'cover',
-                      backgroundPosition: 'center'
+                      backgroundPosition: 'center',
                     }"
                   >
-                  <v-card-title class="white--text">{{ exhibit.exhibitName }}</v-card-title>
+                    <v-card-title class="white--text">{{
+                      exhibit.exhibitName
+                    }}</v-card-title>
                   </v-btn>
                 </template>
                 <template v-slot:default="{ isActive }">
                   <v-card class="pt-8 pb-8">
-                    <v-card-title class="text-center">Modify the exhibit: </v-card-title>
+                    <v-card-title class="text-center"
+                      >Modify the exhibit:
+                    </v-card-title>
                     <div class="horizontal-addnew-title-separator"></div>
                     <v-text-field
                       class="new-name-bar ml-10"
@@ -186,18 +190,6 @@
                       clearable
                     ></v-textarea>
 
-                    <v-file-input
-                      class="new-name-bar mt-4 ml-10 mb-n10"
-                      v-model="orderattachment"
-                      label="Exhibit images..."
-                      :rules="[rules.required]"
-                      variant="underlined"
-                      clearable
-                      chips
-                      multiple
-                    ></v-file-input>
-                    <v-card-text class="ml-14 text-red text-caption">Warning: The images will be overwritten upon the selection of new ones</v-card-text>
-
                     <v-menu>
                       <template v-slot:activator="{ props }">
                         <v-btn
@@ -205,7 +197,7 @@
                           color="white"
                           class="new-name-bar mt-4 ml-10"
                         >
-                          {{ exhibitToMuseum || 'Select Museum' }}
+                          {{ exhibitToMuseum || "Select Museum" }}
                         </v-btn>
                       </template>
                       <v-list>
@@ -237,7 +229,9 @@
                       color="#e89c9c"
                     >
                       <v-card-text>
-                        Modifying the exhibit failed due to unspecified reasons. Check all the fields or if you believe this to be as error contact the system administrator.
+                        Modifying the exhibit failed due to unspecified reasons.
+                        Check all the fields or if you believe this to be as
+                        error contact the system administrator.
                       </v-card-text>
                     </v-card>
 
@@ -257,9 +251,11 @@
                       <v-card-actions>
                         <v-btn
                           class="ml-16 text-red"
-                          @click="() => {
+                          @click="
+                            () => {
                               isActive.value = deleteExhibit();
-                            }"
+                            }
+                          "
                         >
                           Delete
                         </v-btn>
@@ -269,10 +265,12 @@
                         <v-btn
                           class="mr-16"
                           color="secondary"
-                          @click="() => {
-                              isActive.value = false; 
+                          @click="
+                            () => {
+                              isActive.value = false;
                               onClosedDialogReset();
-                            }"
+                            }
+                          "
                         >
                           Close
                         </v-btn>
@@ -282,15 +280,15 @@
                 </template>
               </v-dialog>
             </v-col>
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-              <!-- Exhibit new -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
+            <!--  -->
+            <!--  -->
+            <!--  -->
+            <!--  -->
+            <!-- Exhibit new -->
+            <!--  -->
+            <!--  -->
+            <!--  -->
+            <!--  -->
             <v-col class="d-flex align-center justify-center" cols="2">
               <v-dialog max-width="800" persistent>
                 <template v-slot:activator="{ props: openCreateNewWindow }">
@@ -332,16 +330,14 @@
                       clearable
                     ></v-textarea>
 
-                    <v-file-input
-                      class="new-name-bar mt-4 ml-10"
-                      v-model="orderattachment"
-                      label="Exhibit images..."
-                      :rules="[rules.required]"
-                      variant="underlined"
-                      clearable
-                      chips
-                      multiple
-                    ></v-file-input>
+                    <v-checkbox
+                      v-model="newDisplayed"
+                      class="ml-10 top-checkbox-top-margin"
+                      :ripple="false"
+                      label="Display exhibit"
+                      color="#EB4511"
+                      density="compact"
+                    ></v-checkbox>
 
                     <v-menu>
                       <template v-slot:activator="{ props }">
@@ -350,7 +346,7 @@
                           color="white"
                           class="new-name-bar mt-4 ml-10"
                         >
-                          {{ newToMuseum || 'Select Museum' }}
+                          {{ newToMuseum || "Select Museum" }}
                         </v-btn>
                       </template>
 
@@ -365,14 +361,44 @@
                       </v-list>
                     </v-menu>
 
-                    <v-checkbox
-                      v-model="newDisplayed"
-                      class="ml-10 top-checkbox-top-margin"
-                      :ripple="false"
-                      label="Display exhibit"
-                      color="#EB4511"
-                      density="compact"
-                    ></v-checkbox>
+                    <v-btn
+                      class="new-images-button mt-4 ml-10"
+                      @click="testUploadWidget"
+                    >
+                      Add Images
+                    </v-btn>
+
+                    <v-card
+                      class="new-images-carousel pa-4 ml-10 mt-4 flat"
+                    >
+                      <v-row class="flex-nowrap">
+                        <v-col
+                          v-for="(image, index) in newImagesHolder"
+                          :key="index"
+                          class="d-flex align-center"
+                          cols="auto"
+                        >
+                          <v-card
+                            :style="{
+                              backgroundImage: `url(${image})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                            }"
+                            width="300"
+                            height="169"
+                            class="image-card"
+                            @click="removeImage(index)"
+                          >
+                            <v-card-actions>
+                              <v-spacer></v-spacer>
+                              <v-btn icon @click.stop="removeImage(index)">
+                                <v-icon color="red">mdi-close</v-icon>
+                              </v-btn>
+                            </v-card-actions>
+                          </v-card>
+                        </v-col>
+                      </v-row>
+                    </v-card>
 
                     <v-card
                       v-if="showError"
@@ -383,7 +409,9 @@
                       color="#e89c9c"
                     >
                       <v-card-text>
-                        Adding the exhibit failed due to unspecified reasons. Check all the fields or if you believe this to be as error contact the system administrator.
+                        Adding the exhibit failed due to unspecified reasons.
+                        Check all the fields or if you believe this to be as
+                        error contact the system administrator.
                       </v-card-text>
                     </v-card>
 
@@ -404,10 +432,12 @@
                         <v-btn
                           class="mr-16"
                           color="secondary"
-                          @click="() => {
+                          @click="
+                            () => {
                               isActive.value = false;
                               onClosedDialogReset();
-                            }"
+                            }
+                          "
                         >
                           Close
                         </v-btn>
@@ -431,6 +461,7 @@ import { RouterLink, useRouter } from "vue-router";
 import { ref, onMounted, watch, computed } from "vue";
 import { usePiniaStorage } from "../store/index.js";
 import axios from "axios";
+import { Cloudinary } from "@cloudinary/url-gen";
 
 export default {
   data() {
@@ -441,13 +472,14 @@ export default {
       scienceExhibits: ref(true),
       historyExhibits: ref(true),
       techExhibits: ref(true),
-    }
+    };
   },
 
   setup() {
     // site setup i app bar
     const isMobile = ref(false);
     const isActive = ref(false);
+    const isActiveImages = ref(false);
     const displayedExhibits = ref(true);
     const hiddenExhibits = ref(true);
     const artExhibits = ref(true);
@@ -459,8 +491,8 @@ export default {
     // novi exhibiti
     const newTitle = ref("");
     const newDescription = ref("");
-    const base64Files = ref([]);
-    const orderattachment = ref([]);
+    const newImages = ref([]);
+    const newImagesHolder = ref([]);
     const newDisplayed = ref(false);
     const newToMuseum = ref("");
     const showError = ref(false);
@@ -491,6 +523,7 @@ export default {
       window.addEventListener("resize", updateIsMobile);
 
       getAllExhibits();
+      console.log(newImagesHolder.value);
 
       return () => {
         window.removeEventListener("resize", updateIsMobile);
@@ -507,35 +540,13 @@ export default {
     };
 
     const onClosedDialogReset = () => {
-
       newTitle.value = "";
       newDescription.value = "";
-      orderattachment.value = [];
       newDisplayed.value = false;
-      base64Files.value = [];
+      newImagesHolder.value = [];
       showError.value = false;
       newToMuseum.value = "";
     };
-
-    const printBase = async () => {
-      console.log(base64Files.value);
-    };
-
-    watch(orderattachment, (files) => {
-      base64Files.value = [];
-      if (!files.length) return;
-
-      files.forEach(file => {
-        let fr = new FileReader();
-        fr.addEventListener("load", (e) => {
-          base64Files.value.push(e.target.result);
-        });
-        fr.addEventListener("error", (e) => {
-          console.error(`Error reading file ${file.name}:`, e);
-        });
-        fr.readAsDataURL(file);
-      });
-    });
 
     const selectMuseum = (item) => {
       newToMuseum.value = item;
@@ -551,48 +562,73 @@ export default {
       let filtered = exhibits.value;
 
       if (!displayedExhibits.value && hiddenExhibits.value) {
-        filtered = filtered.filter(exhibit => !exhibit.isDisplayed);
+        filtered = filtered.filter((exhibit) => !exhibit.isDisplayed);
       } else if (displayedExhibits.value && !hiddenExhibits.value) {
-        filtered = filtered.filter(exhibit => exhibit.isDisplayed);
+        filtered = filtered.filter((exhibit) => exhibit.isDisplayed);
       } else if (!displayedExhibits.value && !hiddenExhibits.value) {
         return [];
       }
 
       if (!artExhibits.value) {
-        filtered = filtered.filter(exhibit => exhibit.toMuseum !== 'art');
+        filtered = filtered.filter((exhibit) => exhibit.toMuseum !== "art");
       }
       if (!scienceExhibits.value) {
-        filtered = filtered.filter(exhibit => exhibit.toMuseum !== 'science');
+        filtered = filtered.filter((exhibit) => exhibit.toMuseum !== "science");
       }
       if (!historyExhibits.value) {
-        filtered = filtered.filter(exhibit => exhibit.toMuseum !== 'history');
+        filtered = filtered.filter((exhibit) => exhibit.toMuseum !== "history");
       }
       if (!techExhibits.value) {
-        filtered = filtered.filter(exhibit => exhibit.toMuseum !== 'technology');
+        filtered = filtered.filter(
+          (exhibit) => exhibit.toMuseum !== "technology"
+        );
       }
-
 
       if (search.value) {
         const query = search.value.toLowerCase();
-        filtered = filtered.filter(exhibit =>
+        filtered = filtered.filter((exhibit) =>
           exhibit.exhibitName.toLowerCase().includes(query)
         );
       }
 
       return filtered;
     });
-// 
-// 
-//       POZIV RUTA
-// 
-// 
+
+    const testUploadWidget = async () => {
+      const myWidget = cloudinary.createUploadWidget(
+        {
+          cloudName: "dkzpi7xpb",
+          uploadPreset: "indelect",
+          multiple: true,
+        },
+        (error, result) => {
+          if (!error && result && result.event === "success") {
+            console.log("Done! Here is the image info: ", result.info);
+
+            newImagesHolder.value.push(result.info.secure_url);
+            console.log(newImagesHolder.value);
+          }
+        }
+      );
+
+      myWidget.open();
+    };
+
+    const removeImage = (index) => {
+      newImagesHolder.value.splice(index, 1);
+    };
+    //
+    //
+    //       POZIV RUTA
+    //
+    //
     const newExhibit = async () => {
       showError.value = false;
 
       if (
         !newTitle.value ||
         !newDescription.value ||
-        !base64Files.value ||
+        !newImagesHolder.value ||
         !newToMuseum.value
       ) {
         console.error("All fields are required");
@@ -603,7 +639,7 @@ export default {
         const response = await axios.post("/exhibit/add", {
           exhibitName: newTitle.value,
           description: newDescription.value,
-          images: base64Files.value,
+          images: newImagesHolder.value,
           isDisplayed: newDisplayed.value,
           toMuseum: newToMuseum.value,
         });
@@ -640,7 +676,12 @@ export default {
     const updateExhibit = async () => {
       showError.value = false;
 
-      if (!exhibitID.value || !exhibitTitle.value || !exhibitDescription.value || !exhibitToMuseum.value) {
+      if (
+        !exhibitID.value ||
+        !exhibitTitle.value ||
+        !exhibitDescription.value ||
+        !exhibitToMuseum.value
+      ) {
         console.error("All fields are required");
         showError.value = true;
       }
@@ -648,11 +689,14 @@ export default {
       const updateData = {
         exhibitName: exhibitTitle.value,
         description: exhibitDescription.value,
-        images: base64Files.value,
+        images: newImages,
         isDisplayed: exhibitDisplayed.value,
-        toMuseum: exhibitToMuseum.value
+        toMuseum: exhibitToMuseum.value,
       };
-      console.log('Sending update request with data:', { id: exhibitID.value, updateData });
+      console.log("Sending update request with data:", {
+        id: exhibitID.value,
+        updateData,
+      });
 
       try {
         const response = await axios.post("/exhibit/update", {
@@ -674,7 +718,7 @@ export default {
       console.log(exhibitID.value);
       try {
         const response = await axios.delete("/exhibit/delete", {
-          data: { id: exhibitID.value }
+          data: { id: exhibitID.value },
         });
 
         onClosedDialogReset();
@@ -685,7 +729,7 @@ export default {
         showError.value = true;
       }
     };
- 
+
     return {
       isMobile,
       displayedExhibits,
@@ -700,8 +744,8 @@ export default {
       logout,
       newTitle,
       newDescription,
-      base64Files,
-      orderattachment,
+      newImages,
+      newImagesHolder,
       newDisplayed,
       newToMuseum,
       menu,
@@ -709,7 +753,6 @@ export default {
       selectMuseum,
       newExhibit,
       watch,
-      printBase,
       onClosedDialogReset,
       showError,
       getAllExhibits,
@@ -723,7 +766,10 @@ export default {
       updateExhibit,
       deleteExhibit,
       isActive,
+      isActiveImages,
       search,
+      testUploadWidget,
+      removeImage,
     };
   },
 };
@@ -796,5 +842,20 @@ export default {
   width: 100%;
   background: rgba(0, 0, 0, 0.4);
   padding: 10px 0;
+}
+
+.new-images-button {
+  width: 90%;
+}
+
+.new-images-carousel {
+  overflow-x: auto;
+  width: 90%;
+}
+
+.image-card {
+  cursor: pointer;
+  position: relative;
+  background-color: #f5f5f5;
 }
 </style>
