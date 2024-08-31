@@ -190,6 +190,15 @@
                       clearable
                     ></v-textarea>
 
+                    <v-checkbox
+                      v-model="exhibitDisplayed"
+                      class="ml-10 top-checkbox-top-margin"
+                      :ripple="false"
+                      label="Display exhibit"
+                      color="#EB4511"
+                      density="compact"
+                    ></v-checkbox>
+
                     <v-menu>
                       <template v-slot:activator="{ props }">
                         <v-btn
@@ -211,14 +220,44 @@
                       </v-list>
                     </v-menu>
 
-                    <v-checkbox
-                      v-model="exhibitDisplayed"
-                      class="ml-10 top-checkbox-top-margin"
-                      :ripple="false"
-                      label="Display exhibit"
-                      color="#EB4511"
-                      density="compact"
-                    ></v-checkbox>
+                    <v-btn
+                      class="new-images-button mt-4 ml-10"
+                      @click="testUploadWidgetExisting"
+                    >
+                      Add Images
+                    </v-btn>
+
+                    <v-card
+                      class="new-images-carousel pa-4 ml-10 mt-4 flat"
+                    >
+                      <v-row class="flex-nowrap">
+                        <v-col
+                          v-for="(image, index) in exhibitImages"
+                          :key="index"
+                          class="d-flex align-center"
+                          cols="auto"
+                        >
+                          <v-card
+                            :style="{
+                              backgroundImage: `url(${image})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                            }"
+                            width="300"
+                            height="169"
+                            class="image-card"
+                            @click="removeImageExisting(index)"
+                          >
+                            <v-card-actions>
+                              <v-spacer></v-spacer>
+                              <v-btn icon @click.stop="removeImageExisting(index)">
+                                <v-icon color="red">mdi-close</v-icon>
+                              </v-btn>
+                            </v-card-actions>
+                          </v-card>
+                        </v-col>
+                      </v-row>
+                    </v-card>
 
                     <v-card
                       v-if="showError"
@@ -268,7 +307,8 @@
                           @click="
                             () => {
                               isActive.value = false;
-                              onClosedDialogReset();
+                              onClosedDialogResetExisting();
+                              getAllExhibits();
                             }
                           "
                         >
@@ -491,7 +531,6 @@ export default {
     // novi exhibiti
     const newTitle = ref("");
     const newDescription = ref("");
-    const newImages = ref([]);
     const newImagesHolder = ref([]);
     const newDisplayed = ref(false);
     const newToMuseum = ref("");
@@ -546,6 +585,15 @@ export default {
       newImagesHolder.value = [];
       showError.value = false;
       newToMuseum.value = "";
+    };
+
+    const onClosedDialogResetExisting = () => {
+      exhibitTitle.value = "";
+      exhibitDescription.value = "";
+      exhibitDisplayed.value = false;
+      exhibitImages.value = [];
+      showError.value = false;
+      exhibitToMuseum.value = "";
     };
 
     const selectMuseum = (item) => {
@@ -614,8 +662,32 @@ export default {
       myWidget.open();
     };
 
+    const testUploadWidgetExisting = async () => {
+      const myWidget = cloudinary.createUploadWidget(
+        {
+          cloudName: "dkzpi7xpb",
+          uploadPreset: "indelect",
+          multiple: true,
+        },
+        (error, result) => {
+          if (!error && result && result.event === "success") {
+            console.log("Done! Here is the image info: ", result.info);
+
+            exhibitImages.value.push(result.info.secure_url);
+            console.log(exhibitImages.value);
+          }
+        }
+      );
+
+      myWidget.open();
+    };
+
     const removeImage = (index) => {
       newImagesHolder.value.splice(index, 1);
+    };
+
+    const removeImageExisting = (index) => {
+      exhibitImages.value.splice(index, 1);
     };
     //
     //
@@ -689,7 +761,7 @@ export default {
       const updateData = {
         exhibitName: exhibitTitle.value,
         description: exhibitDescription.value,
-        images: newImages,
+        images: exhibitImages.value,
         isDisplayed: exhibitDisplayed.value,
         toMuseum: exhibitToMuseum.value,
       };
@@ -704,7 +776,7 @@ export default {
           updateData,
         });
 
-        onClosedDialogReset();
+        onClosedDialogResetExisting();
         await getAllExhibits();
         console.log("Update successful:", response.data);
       } catch (error) {
@@ -721,9 +793,10 @@ export default {
           data: { id: exhibitID.value },
         });
 
-        onClosedDialogReset();
+        onClosedDialogResetExisting();
         await getAllExhibits();
         console.log("Delete successful:", response.data);
+        
       } catch (error) {
         console.error("Deleting exhibit failed:", error);
         showError.value = true;
@@ -744,7 +817,6 @@ export default {
       logout,
       newTitle,
       newDescription,
-      newImages,
       newImagesHolder,
       newDisplayed,
       newToMuseum,
@@ -754,6 +826,7 @@ export default {
       newExhibit,
       watch,
       onClosedDialogReset,
+      onClosedDialogResetExisting,
       showError,
       getAllExhibits,
       exhibitTitle,
@@ -769,7 +842,9 @@ export default {
       isActiveImages,
       search,
       testUploadWidget,
+      testUploadWidgetExisting,
       removeImage,
+      removeImageExisting,
     };
   },
 };
