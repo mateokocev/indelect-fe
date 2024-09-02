@@ -63,9 +63,9 @@
             required
           ></v-text-field>
           <v-btn type="submit" :disabled="paymentDetails.cvc == '' " class="pay-button"  color="primary" @click="this.getQrCode()">Pay Now</v-btn>
-   <h3>your qr code</h3>
+   
        <v-img :src="nasQrKod"></v-img>
-          <v-btn  type="submit" class="pay-button mt-3" color="primary" @click="this.usporedi(nasQrKod)">Usporedi</v-btn>
+          <v-btn  type="submit" class="pay-button mt-3" color="primary" @click="this.usporedi(nasQrKod)">Redeem</v-btn>
 
         </v-form>
       </v-container>

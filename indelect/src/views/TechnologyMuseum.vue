@@ -1,141 +1,151 @@
 <template>
-    <v-app>
-  <div>
-  <v-container v-if="!isMobile" ></v-container>
-  
-  <v-contain v-else>
-    <v-app-bar
-      dense
-      clipped-left
-      color="#B02E0C"
-      app
-      dark
-      fixed
-      elevate-on-scroll
-    >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="btn-fix"></v-app-bar-nav-icon>
-      <v-toolbar-title>Indelect</v-toolbar-title>
-    </v-app-bar>
-  
-    <v-navigation-drawer
-      class="fixed-drawer"
-      width="250"
-      v-model="drawer"
-      app
-    >
-      <v-list-item class="px-2">
-        <v-list-item-title>{{  userName }}</v-list-item-title>
-      </v-list-item>
-      <v-divider></v-divider>
-      <v-list dense>
-        <v-list-item link @click="logout">
-          <v-list-item-icon>
-            <v-icon>mdi-logout</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>Log Out</v-list-item-title>
-          </v-list-item-content>
+  <v-app>
+    <!-- Navigation and App Bar -->
+    <v-container>
+      <v-app-bar
+        dense
+        clipped-left
+        color="#B02E0C"
+        app
+        dark
+        fixed
+        elevate-on-scroll
+      >
+        <v-app-bar-nav-icon
+          @click.stop="drawer = !drawer"
+          class="btn-fix"
+        ></v-app-bar-nav-icon>
+        <v-toolbar-title>Indelect</v-toolbar-title>
+      </v-app-bar>
+
+      <!-- Navigation Drawer -->
+      <v-navigation-drawer
+        class="fixed-drawer"
+        width="250"
+        v-model="drawer"
+        app
+      >
+        <v-list-item class="px-4">
+          <v-list-item-title >Username: {{ userName }}</v-list-item-title>
+          
         </v-list-item>
         <v-divider></v-divider>
-      </v-list>
-    </v-navigation-drawer>
-  
-    <v-card>
-      <div>
-        <h1 class="mt-15">Welcome to the Technology Museum Map</h1>
+        <v-list dense>
+          <v-list-item link @click="logout">
+            <v-list-item-icon>
+              <v-icon>mdi-logout</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Log Out</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-divider></v-divider>
+        </v-list>
+      </v-navigation-drawer>
+    </v-container>
+
+    <!-- Main Content -->
+    <v-container>
+      <v-card class="pa-4" outlined>
+        <h1 class="mt-4 mb-4 text-center">Welcome to the Technology Museum Map</h1>
         <div class="map-container">
-          <!-- Map Image (You can replace the image URL with your own map) -->
-          <img src="../assets/mapa1.png" alt="Museum Map" class="map-image" >
-          <!-- Hotspots -->
-           <div v-for="(exhibit, index) in exhibits"
-           :key="exhibit._id" > 
-            <v-btn class="hotspot-button">
-            {{ exhibit.exhibitName }}
-          </v-btn>
+          <!-- Museum Map Image -->
+          <img src="../assets/mapa1.png" alt="Museum Map" class="map-image" />
         </div>
-         
-        </div>
-        <!-- Exhibition Item Details -->
-        <div v-if="selectedItem" class="exhibition-details">
-          <h2>Exhibition Item Details</h2>
-          <div>
-            <p>ID: {{ selectedItem.id }}</p>
-            <p>Name: {{ selectedItem.name }}</p>
-            <!-- Add more details as needed -->
+      </v-card>
+
+      <!-- Exhibit Buttons Container -->
+      <v-card class="pa-4 mt-4" outlined>
+        <h2 class="text-center mb-4">Exhibit Pieces</h2>
+        <!-- Loop to create a button for each science exhibit -->
+        <div class="exhibit-buttons-container">
+          <div v-for="exhibit in scienceExhibits" :key="exhibit._id" class="mb-2">
+            <v-btn
+              color="primary"
+              class="rounded-btn"
+              @click="openDialog(exhibit)"
+            >
+              {{ exhibit.exhibitName }}
+            </v-btn>
           </div>
         </div>
-      </div>
-    </v-card>
-  
-    <!-- New container for exhibit buttons -->
-    <v-card>
-      <div class="exhibit-buttons-container">
-        <h2>Exhibit Pieces</h2>
-        <v-btn v-for="spot in exhibits" :key="spot._id">
-          {{ spot.exhibitName }}
-        </v-btn>
-      </div>
-    </v-card>
-  </v-contain>
-  </div>
+      </v-card>
+
+      <!-- Dialog for Science Museum Images -->
+      <v-dialog max-width="500" v-model="dialogVisible">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{ selectedItem.exhibitName }}</span>
+          </v-card-title>
+
+          <v-card-text>
+            <p>{{ selectedItem.description }}</p>
+            <div v-for="(image, imgIndex) in selectedItem.images" :key="imgIndex">
+              <v-img :src="image" alt="Science Image"></v-img>
+            </div>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="dialogVisible = false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-container>
   </v-app>
-  </template>
-  
-  <script>
-  import { ref, onMounted } from "vue";
-  import { useRouter } from "vue-router";
-  import axios from "axios";
-  
-  export default {
-    setup() {
-      const isMobile = ref(false);
-      const tickets = ref([]);
-      const mini = ref(false);
-      const drawer = ref(false);
-      const userName = ref(null);
-      const router = useRouter();
-      const exhibits = ref([]);
-      let Museumname= ref("ovdje stavi ime muzeja")
-      
-  
-      const updateIsMobile = () => {
-        isMobile.value = window.innerWidth <= 480;
-        if (!isMobile.value) {
-          router.push({ name: "warning" });
-        }
+</template>
+
+<script>
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
+
+export default {
+  setup() {
+    const isMobile = ref(false);
+    const drawer = ref(false);
+    const userName = ref(null);
+    const router = useRouter();
+    const exhibits = ref([]);
+    const selectedItem = ref(null);
+    const scienceExhibits = ref([]);
+    const dialogVisible = ref(false);
+
+    const updateIsMobile = () => {
+      isMobile.value = window.innerWidth <= 480;
+      if (!isMobile.value) {
+        router.push({ name: "warning" });
+      }
+    };
+
+    onMounted(() => {
+      updateIsMobile();
+      getAllExhibits();
+
+      window.addEventListener("resize", updateIsMobile);
+      getUsername();
+      return () => {
+        window.removeEventListener("resize", updateIsMobile);
       };
-  
-      onMounted(async () => {
-        updateIsMobile();
-        getAllExhibits();
-        Museumname =  router.currentRoute.value.params.MuseumName.slice(0, -2);
-       
-        await getUsername();
-        window.addEventListener("resize", updateIsMobile);
-        try {
-          const response = await axios.get("/ticket/getAllTickets");
-          tickets.value = response.data;
-          console.log("Tickets fetched successfully:", tickets.value);
-        } catch (error) {
-          console.error("Error fetching tickets:", error);
-        }
-        return () => {
-          window.removeEventListener("resize", updateIsMobile);
-        };
-      });
-  
-      const getAllExhibits = async () => {
-        try {
-          const response = await axios.get("/exhibit/getall");
-          exhibits.value = response.data;
-          console.log(exhibits.value);
-        } catch (error) {
-          console.error("Getting exhibits failed:", error);
-        }
-      };
-  
-  
-      const getUsername = async () => {
+    });
+
+    const getAllExhibits = async () => {
+      try {
+        const response = await axios.get("/exhibit/getall");
+        exhibits.value = response.data;
+        // Filter science exhibits
+        scienceExhibits.value = exhibits.value.filter(exhibit => exhibit.toMuseum === "technology");
+      } catch (error) {
+        console.error("Getting exhibits failed:", error);
+      }
+    };
+
+    const openDialog = (exhibit) => {
+      selectedItem.value = exhibit;
+      dialogVisible.value = true; // Open the dialog
+    };
+
+    const getUsername = async () => {
       try {
         const userEmail = localStorage.getItem("userEmail");
         const response = await axios.get(`/GetUserName?email=${userEmail}`);
@@ -145,44 +155,78 @@
       }
     };
 
-  
-      const logout = async () => {
-        // Implement your logout logic
-        router.push({ name: "login" });
-      };
-  
-    const goToPayment = async (MuseumName, Price) => {
-        
-        router.push("payment/"+MuseumName+Price);
-      };
-      return {
-        isMobile,
-        tickets,
-        drawer,
-        logout,
-        goToPayment,
-        getAllExhibits,
-        userName,
-        Museumname,
-      };
-    },
-  };
-  </script>
-  
-  <style>
-  /* Add CSS styles for the map container and hotspots */
-  .map-container {
-    position: relative;
-  }
-  .map-image {
-    width: 100%;
-    height: 100%;
-  }
-  .hotspot-button {
-    position: absolute;
-  }
-  .exhibition-details {
-    margin-top: 20px;
-  }
-  </style>
-  
+    const logout = () => {
+      router.push({ name: "login" });
+    };
+
+    const handleAction1 = () => {
+      // Implement your action 1 logic
+    };
+
+    const handleAction2 = () => {
+      // Implement your action 2 logic
+    };
+
+    return {
+      isMobile,
+      drawer,
+      userName,
+      selectedItem,
+      scienceExhibits,
+      dialogVisible,
+      openDialog,
+      logout,
+      handleAction1,
+      handleAction2
+    };
+  },
+};
+</script>
+
+
+<style>
+/* General styling */
+.v-card {
+  background-color: #f9f9f9;
+}
+
+/* Map container */
+.map-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+  text-align: center;
+}
+
+.map-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Exhibit buttons container */
+.exhibit-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.rounded-btn {
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 16px;
+  text-transform: none;
+}
+
+/* Navigation drawer */
+.fixed-drawer {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 18px;
+  color: #fff;
+}
+</style>

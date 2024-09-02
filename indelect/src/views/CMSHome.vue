@@ -8,7 +8,7 @@
             max-width="80"
             rounded
             flat
-            src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+            src="https://res.cloudinary.com/dkzpi7xpb/image/upload/v1725308281/logo_ek0dql.png"
           ></v-img>
 
           <div class="vertical-separator"></div>

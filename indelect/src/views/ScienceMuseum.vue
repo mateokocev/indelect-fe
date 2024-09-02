@@ -25,8 +25,9 @@
         v-model="drawer"
         app
       >
-        <v-list-item class="px-2">
-          <v-list-item-title>{{ userName }}</v-list-item-title>
+        <v-list-item class="px-4">
+          <v-list-item-title >Username: {{ userName }}</v-list-item-title>
+          
         </v-list-item>
         <v-divider></v-divider>
         <v-list dense>
@@ -45,87 +46,51 @@
 
     <!-- Main Content -->
     <v-container>
-      <v-card>
-        <div>
-          <h1 class="mt-15">Welcome to the Science Museum Map</h1>
-          <div class="map-container">
-            <!-- Museum Map Image -->
-            <img src="../assets/mapa1.png" alt="Museum Map" class="map-image" />
-          </div>
-
-          
-
-          <!-- Exhibition Item Details (shown when an exhibit is clicked) -->
-          <div v-if="selectedItem" class="exhibition-details">
-            <h2>Exhibition Item Details</h2>
-            <div>
-              <p>ID: {{ selectedItem._id }}</p>
-              <p>Name: {{ selectedItem.exhibitName }}</p>
-            </div>
-
-            <!-- Buttons for additional actions -->
-            <div class="button-container">
-              <v-btn color="primary" @click="handleAction1()">Action 1</v-btn>
-              <v-btn color="secondary" @click="handleAction2()">Action 2</v-btn>
-            </div>
-          </div>
+      <v-card class="pa-4" outlined>
+        <h1 class="mt-4 mb-4 text-center">Welcome to the Science Museum Map</h1>
+        <div class="map-container">
+          <!-- Museum Map Image -->
+          <img src="../assets/mapa1.png" alt="Museum Map" class="map-image" />
         </div>
       </v-card>
 
-      <!-- Optional: Exhibit Buttons Container (can be used for additional UI) -->
-      <v-card>
+      <!-- Exhibit Buttons Container -->
+      <v-card class="pa-4 mt-4" outlined>
+        <h2 class="text-center mb-4">Exhibit Pieces</h2>
+        <!-- Loop to create a button for each science exhibit -->
         <div class="exhibit-buttons-container">
-          <h2>Exhibit Pieces</h2>
-          <v-btn @click="openDialog">Show Science Museum Images</v-btn>
-          <v-btn>2</v-btn>
+          <div v-for="exhibit in scienceExhibits" :key="exhibit._id" class="mb-2">
+            <v-btn
+              color="primary"
+              class="rounded-btn"
+              @click="openDialog(exhibit)"
+            >
+              {{ exhibit.exhibitName }}
+            </v-btn>
+          </div>
         </div>
       </v-card>
 
-      <v-dialog max-width="500">
-        <template v-slot:activator="{ props: activatorProps }">
-          <v-btn
-            v-bind="activatorProps"
-            color="surface-variant"
-            text="Open Dialog"
-            variant="flat"
-          ></v-btn>
-        </template>
+      <!-- Dialog for Science Museum Images -->
+      <v-dialog max-width="500" v-model="dialogVisible">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{ selectedItem.exhibitName }}</span>
+          </v-card-title>
 
-        <template v-slot:default="{ isActive }">
-          <v-card title="Dialog">
-            <v-card>
-              <v-card-title>
-                <span class="headline">Science Museum Images</span>
-              </v-card-title>
-              <v-card-text>
-                  <div
-                    v-for="(image, index) in scienceImages"
-                    :key="index"
-                  >
-                    <v-img :src="image"></v-img>
-                  </div>
+          <v-card-text>
+            <p>{{ selectedItem.description }}</p>
+            <div v-for="(image, imgIndex) in selectedItem.images" :key="imgIndex">
+              <v-img :src="image" alt="Science Image"></v-img>
+            </div>
+          </v-card-text>
 
-                  {{ scienceImages }}
-
-              </v-card-text>
-
-            </v-card>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-
-              <v-btn
-                text="Close Dialog"
-                @click="isActive.value = false"
-              ></v-btn>
-            </v-card-actions>
-          </v-card>
-        </template>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="dialogVisible = false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
       </v-dialog>
-
-      
-
-    
     </v-container>
   </v-app>
 </template>
@@ -136,23 +101,15 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 
 export default {
-
-  data() {
-    return {
-      scienceImages: ref([])
-    }
-  },
-
   setup() {
     const isMobile = ref(false);
-    const tickets = ref([]);
-    const mini = ref(false);
     const drawer = ref(false);
     const userName = ref(null);
     const router = useRouter();
     const exhibits = ref([]);
     const selectedItem = ref(null);
-    const scienceImages = ref([]);
+    const scienceExhibits = ref([]);
+    const dialogVisible = ref(false);
 
     const updateIsMobile = () => {
       isMobile.value = window.innerWidth <= 480;
@@ -161,20 +118,12 @@ export default {
       }
     };
 
-    onMounted(async () => {
+    onMounted(() => {
       updateIsMobile();
       getAllExhibits();
-      openDialog();
 
-      await getUsername();
       window.addEventListener("resize", updateIsMobile);
-      try {
-        const response = await axios.get("/ticket/getAllTickets");
-        tickets.value = response.data;
-        console.log("Tickets fetched successfully:", tickets.value);
-      } catch (error) {
-        console.error("Error fetching tickets:", error);
-      }
+      getUsername();
       return () => {
         window.removeEventListener("resize", updateIsMobile);
       };
@@ -184,19 +133,16 @@ export default {
       try {
         const response = await axios.get("/exhibit/getall");
         exhibits.value = response.data;
-
-        console.log(exhibits.value);
+        // Filter science exhibits
+        scienceExhibits.value = exhibits.value.filter(exhibit => exhibit.toMuseum === "science");
       } catch (error) {
         console.error("Getting exhibits failed:", error);
       }
     };
 
-    const openDialog = () => {
-      const scienceImagesTemp = exhibits.value.flatMap((exhibit) =>
-        exhibit.toMuseum === "science" ? exhibit.images : []
-      );
-      scienceImages.value = scienceImagesTemp;
-      console.log(scienceImages.value)
+    const openDialog = (exhibit) => {
+      selectedItem.value = exhibit;
+      dialogVisible.value = true; // Open the dialog
     };
 
     const getUsername = async () => {
@@ -208,46 +154,79 @@ export default {
         console.error("Error:", error);
       }
     };
-    const showExhibitDetails = (exhibit) => {
-      selectedItem.value = exhibit;
-    };
 
-    const logout = async () => {
-      // Implement your logout logic
+    const logout = () => {
       router.push({ name: "login" });
     };
 
-    const goToPayment = async (MuseumName, Price) => {
-      router.push("payment/" + MuseumName + Price);
+    const handleAction1 = () => {
+      // Implement your action 1 logic
     };
+
+    const handleAction2 = () => {
+      // Implement your action 2 logic
+    };
+
     return {
       isMobile,
-      tickets,
       drawer,
-      logout,
-      goToPayment,
-      getAllExhibits,
       userName,
-      showExhibitDetails,
+      selectedItem,
+      scienceExhibits,
+      dialogVisible,
       openDialog,
+      logout,
+      handleAction1,
+      handleAction2
     };
   },
 };
 </script>
 
+
 <style>
-/* Add CSS styles for the map container and hotspots */
+/* General styling */
+.v-card {
+  background-color: #f9f9f9;
+}
+
+/* Map container */
 .map-container {
   position: relative;
+  width: 100%;
+  height: auto;
+  text-align: center;
 }
+
 .map-image {
   width: 100%;
-  height: 100%;
+  height: auto;
+  border-radius: 8px;
 }
-.hotspot-button {
-  position: absolute;
+
+/* Exhibit buttons container */
+.exhibit-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
 }
-.exhibition-details {
-  margin-top: 20px;
+
+.rounded-btn {
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 16px;
+  text-transform: none;
+}
+
+/* Navigation drawer */
+.fixed-drawer {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 18px;
+  color: #fff;
 }
 </style>

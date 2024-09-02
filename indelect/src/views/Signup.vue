@@ -5,7 +5,7 @@
         <v-img
           class="mx-auto my-6"
           max-width="228"
-          src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+          src="https://res.cloudinary.com/dkzpi7xpb/image/upload/v1725308281/logo_ek0dql.png"
         ></v-img>
 
         <v-card
@@ -103,7 +103,7 @@
         <v-img
           class="mx-auto my-6"
           max-width="228"
-          src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+          src="https://res.cloudinary.com/dkzpi7xpb/image/upload/v1725308281/logo_ek0dql.png"
         ></v-img>
 
         <v-card
