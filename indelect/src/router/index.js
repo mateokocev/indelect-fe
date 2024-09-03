@@ -1,19 +1,13 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { usePiniaStorage } from "../store/index.js";
 
-import HomeView from "../views/home.vue";
 import LoginVue from "../views/Login.vue";
 import SignUp from "../views/Signup.vue";
-import Exibit from "../views/Exibit.vue";
-import BuyTicket from "../views/BuyTicket.vue";
-import Explore from "../views/Explore.vue";
-import Map from "../views/Map.vue";
 import WrongDev from "../views/WrongDev.vue";
 import CMSHome from "../views/CMSHome.vue";
 import NoAccessDev from "../views/NoAccessDev.vue";
 import TicketList from "../views/TicketList.vue";
 import Payment from "../views/Payment.vue";
-import Checkout from "../views/Checkout.vue";
 import Science from "../views/ScienceMuseum.vue";
 import Art from "../views/ArtMuseum.vue";
 import HistoryMuseum from "../views/HistoryMuseum.vue";
@@ -25,11 +19,6 @@ import Tech from "../views/TechnologyMuseum.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: "/home",
-      name: "home",
-      component: HomeView,
-    },
     {
       path: "/warning",
       name: "warning",
@@ -56,26 +45,6 @@ const router = createRouter({
       path: "/signup",
       name: "SignUp",
       component: SignUp,
-    },
-    {
-      path: "/exibit",
-      name: "Exibit",
-      component: Exibit,
-    },
-    {
-      path: "/buyticket",
-      name: "BuyTicket",
-      component: BuyTicket,
-    },
-    {
-      path: "/explore",
-      name: "Explore",
-      component: Explore,
-    },
-    {
-      path: "/map",
-      name: "Map",
-      component: Map,
     },
     {
       path: "/map/Science Museum",
@@ -107,11 +76,6 @@ const router = createRouter({
       path: "/payment",
       name: "payment",
       component: Payment,
-    },
-    {
-      path: "/checkout",
-      name: "checkout",
-      component: Checkout,
     },
     {
       path: "/payment/:MuseumName", 
