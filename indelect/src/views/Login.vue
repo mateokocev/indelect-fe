@@ -160,7 +160,6 @@
           Log In
         </v-btn>
 
-        
         <v-card-text class="text-center">
           <router-link
             to="/signup"
@@ -221,8 +220,10 @@ export default {
     const hashPassword = async (password) => {
       const encoder = new TextEncoder();
       const data = encoder.encode(password);
-      const hash = await crypto.subtle.digest('SHA-256', data);
-      return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+      const hash = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(hash))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
     };
 
     const login = async () => {
@@ -245,23 +246,22 @@ export default {
           password: hashedPassword,
         });
 
-    console.log("Login successful:", response.data);
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("isAdmin", response.data.isAdmin);
-    localStorage.setItem("userEmail", email.value); // Save email address locally
-    localStorage.setItem("User", email.value);
-    piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
+        console.log("Login successful:", response.data);
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("isAdmin", response.data.isAdmin);
+        localStorage.setItem("userEmail", email.value);
+        localStorage.setItem("User", email.value);
+        piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
 
         if (piniaStorage.getAdmin && isMobile.value) {
-          router.push({ name: 'warning' });
+          router.push({ name: "warning" });
         } else if (!piniaStorage.getAdmin && !isMobile.value) {
-          router.push({ name: 'warning' });
+          router.push({ name: "warning" });
         } else if (piniaStorage.getAdmin && !isMobile.value) {
-          router.push({ name: 'cmshome' });
+          router.push({ name: "cmshome" });
         } else if (!piniaStorage.getAdmin && isMobile.value) {
-          router.push({ name: 'ticketlist' });
+          router.push({ name: "ticketlist" });
         }
-
       } catch (error) {
         console.error("Login failed:", error);
         showError.value = true;
