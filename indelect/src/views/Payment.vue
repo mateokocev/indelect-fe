@@ -20,7 +20,7 @@
       app
     >
       <v-list-item class="px-2">
-        <v-list-item-title>{{  userName }}</v-list-item-title>
+        <v-list-item-title>Username: {{  userName }}</v-list-item-title>
       </v-list-item>
       <v-divider></v-divider>
       <v-list dense>          

@@ -50,7 +50,7 @@
         <h1 class="mt-4 mb-4 text-center">Welcome to the Technology Museum Map</h1>
         <div class="map-container">
           <!-- Museum Map Image -->
-          <img src="../assets/mapa1.png" alt="Museum Map" class="map-image" />
+          <img src="../assets/mapa3.png" alt="Museum Map" class="map-image" />
         </div>
       </v-card>
 
