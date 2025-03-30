@@ -10,8 +10,13 @@ import axios from 'axios'
 import { PiniaVuePlugin, createPinia } from 'pinia'
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
  axios.defaults.baseURL = "http://localhost:3000/api";
 //axios.defaults.baseURL = "https://indelect-be.onrender.com/api"
+=======
+axios.defaults.baseURL = "http://localhost:3000/api";
+// axios.defaults.baseURL = "https://indelect-be.onrender.com/api"
+>>>>>>> Stashed changes
 =======
 axios.defaults.baseURL = "http://localhost:3000/api";
 // axios.defaults.baseURL = "https://indelect-be.onrender.com/api"
