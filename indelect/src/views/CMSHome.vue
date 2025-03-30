@@ -708,7 +708,7 @@ export default {
       }
 
       try {
-        const response = await axios.post("/exhibit/add", {
+        const response = await axios.post("/exhibit", {
           exhibitName: newTitle.value,
           description: newDescription.value,
           images: newImagesHolder.value,
@@ -727,7 +727,7 @@ export default {
 
     const getAllExhibits = async () => {
       try {
-        const response = await axios.get("/exhibit/getall");
+        const response = await axios.get("/exhibit");
         exhibits.value = response.data;
         console.log(exhibits.value);
       } catch (error) {
@@ -765,16 +765,9 @@ export default {
         isDisplayed: exhibitDisplayed.value,
         toMuseum: exhibitToMuseum.value,
       };
-      console.log("Sending update request with data:", {
-        id: exhibitID.value,
-        updateData,
-      });
 
       try {
-        const response = await axios.post("/exhibit/update", {
-          id: exhibitID.value,
-          updateData,
-        });
+        const response = await axios.put(`/exhibit/${exhibitID.value}`, updateData);
 
         onClosedDialogResetExisting();
         await getAllExhibits();
@@ -788,20 +781,19 @@ export default {
     const deleteExhibit = async () => {
       showError.value = false;
       console.log(exhibitID.value);
+
       try {
-        const response = await axios.delete("/exhibit/delete", {
-          data: { id: exhibitID.value },
-        });
+        const response = await axios.delete(`/exhibit/${exhibitID.value}`);
 
         onClosedDialogResetExisting();
         await getAllExhibits();
         console.log("Delete successful:", response.data);
-        
       } catch (error) {
         console.error("Deleting exhibit failed:", error);
         showError.value = true;
       }
     };
+
 
     return {
       isMobile,

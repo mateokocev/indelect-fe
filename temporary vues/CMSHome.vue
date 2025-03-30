@@ -8,7 +8,7 @@
             max-width="80"
             rounded
             flat
-            src="https://i.postimg.cc/s1v7Gj6p/your-image.jpg"
+            src="https://res.cloudinary.com/dkzpi7xpb/image/upload/v1725308281/logo_ek0dql.png"
           ></v-img>
 
           <div class="vertical-separator"></div>
@@ -61,16 +61,53 @@
                   color="#EB4511"
                   density="compact"
                 ></v-checkbox>
+
+                <v-checkbox
+                  class="ml-6"
+                  v-model="artExhibits"
+                  :ripple="false"
+                  label="Art museum exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
+
+                <v-checkbox
+                  class="ml-6"
+                  v-model="scienceExhibits"
+                  :ripple="false"
+                  label="Science museum exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
+
+                <v-checkbox
+                  class="ml-6"
+                  v-model="historyExhibits"
+                  :ripple="false"
+                  label="History museum exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
+
+                <v-checkbox
+                  class="ml-6"
+                  v-model="techExhibits"
+                  :ripple="false"
+                  label="Tech museum exhibits"
+                  color="#EB4511"
+                  density="compact"
+                ></v-checkbox>
+
                 <div class="horizontal-filter-title-separator"></div>
 
-                
                 <v-toolbar color="white">
+                  <v-spacer></v-spacer>
                   <v-card-actions>
-                    <v-btn class="justify-center" color="secondary" @click="isActive.value = false">
+                    <v-btn color="secondary" @click="isActive.value = false">
                       Close
                     </v-btn>
                   </v-card-actions>
-
+                  <v-spacer></v-spacer>
                 </v-toolbar>
               </v-card>
             </template>
@@ -88,25 +125,25 @@
             <v-icon>mdi-logout-variant</v-icon>
           </v-btn>
         </v-app-bar>
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
         <!-- Exhibit buttons -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
         <v-container
           class="mt-16 mb-3"
           style="padding: 16px 2px; margin-left: 0px"
         >
           <v-row>
             <v-col
-            v-for="(exhibit, index) in filteredExhibits"
-            :key="exhibit._id"
-            class="d-flex align-center justify-center"
-            cols="2"
+              v-for="(exhibit, index) in filteredExhibits"
+              :key="exhibit._id"
+              class="d-flex align-center justify-center"
+              cols="2"
             >
               <v-dialog max-width="800" persistent>
                 <template v-slot:activator="{ props: openEditExistingWindow }">
@@ -121,15 +158,19 @@
                     :style="{
                       backgroundImage: `url(${exhibit.images[0]})`,
                       backgroundSize: 'cover',
-                      backgroundPosition: 'center'
+                      backgroundPosition: 'center',
                     }"
                   >
-                  <v-card-title class="white--text">{{ exhibit.exhibitName }}</v-card-title>
+                    <v-card-title class="white--text">{{
+                      exhibit.exhibitName
+                    }}</v-card-title>
                   </v-btn>
                 </template>
                 <template v-slot:default="{ isActive }">
                   <v-card class="pt-8 pb-8">
-                    <v-card-title class="text-center">Modify the exhibit: </v-card-title>
+                    <v-card-title class="text-center"
+                      >Modify the exhibit:
+                    </v-card-title>
                     <div class="horizontal-addnew-title-separator"></div>
                     <v-text-field
                       class="new-name-bar ml-10"
@@ -149,18 +190,6 @@
                       clearable
                     ></v-textarea>
 
-                    <v-file-input
-                      class="new-name-bar mt-4 ml-10 mb-n10"
-                      v-model="orderattachment"
-                      label="Exhibit images..."
-                      :rules="[rules.required]"
-                      variant="underlined"
-                      clearable
-                      chips
-                      multiple
-                    ></v-file-input>
-                    <v-card-text class="ml-14 text-red text-caption">Warning: The images will be overwritten upon the selection of new ones</v-card-text>
-
                     <v-checkbox
                       v-model="exhibitDisplayed"
                       class="ml-10 top-checkbox-top-margin"
@@ -169,6 +198,66 @@
                       color="#EB4511"
                       density="compact"
                     ></v-checkbox>
+
+                    <v-menu>
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          color="white"
+                          class="new-name-bar mt-4 ml-10"
+                        >
+                          {{ exhibitToMuseum || "Select Museum" }}
+                        </v-btn>
+                      </template>
+                      <v-list>
+                        <v-list-item
+                          v-for="(item, index) in museumOptions"
+                          :key="index"
+                          @click="selectModifyExhibitMuseum(item)"
+                        >
+                          <v-list-item-title>{{ item }}</v-list-item-title>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+
+                    <v-btn
+                      class="new-images-button mt-4 ml-10"
+                      @click="testUploadWidgetExisting"
+                    >
+                      Add Images
+                    </v-btn>
+
+                    <v-card
+                      class="new-images-carousel pa-4 ml-10 mt-4 flat"
+                    >
+                      <v-row class="flex-nowrap">
+                        <v-col
+                          v-for="(image, index) in exhibitImages"
+                          :key="index"
+                          class="d-flex align-center"
+                          cols="auto"
+                        >
+                          <v-card
+                            :style="{
+                              backgroundImage: `url(${image})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                            }"
+                            width="300"
+                            height="169"
+                            class="image-card"
+                            @click="removeImageExisting(index)"
+                          >
+                            <v-card-actions>
+                              <v-spacer></v-spacer>
+                              <v-btn icon @click.stop="removeImageExisting(index)">
+                                <v-icon color="red">mdi-close</v-icon>
+                              </v-btn>
+                            </v-card-actions>
+                          </v-card>
+                        </v-col>
+                      </v-row>
+                    </v-card>
 
                     <v-card
                       v-if="showError"
@@ -179,7 +268,9 @@
                       color="#e89c9c"
                     >
                       <v-card-text>
-                        Modifying the exhibit failed due to unspecified reasons. Check all the fields or if you believe this to be as error contact the system administrator.
+                        Modifying the exhibit failed due to unspecified reasons.
+                        Check all the fields or if you believe this to be as
+                        error contact the system administrator.
                       </v-card-text>
                     </v-card>
 
@@ -199,9 +290,11 @@
                       <v-card-actions>
                         <v-btn
                           class="ml-16 text-red"
-                          @click="() => {
+                          @click="
+                            () => {
                               isActive.value = deleteExhibit();
-                            }"
+                            }
+                          "
                         >
                           Delete
                         </v-btn>
@@ -211,10 +304,13 @@
                         <v-btn
                           class="mr-16"
                           color="secondary"
-                          @click="() => {
-                              isActive.value = false; 
-                              onClosedDialogReset();
-                            }"
+                          @click="
+                            () => {
+                              isActive.value = false;
+                              onClosedDialogResetExisting();
+                              getAllExhibits();
+                            }
+                          "
                         >
                           Close
                         </v-btn>
@@ -224,15 +320,15 @@
                 </template>
               </v-dialog>
             </v-col>
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
-              <!-- Exhibit new -->
-<!--  -->
-<!--  -->
-<!--  -->
-<!--  -->
+            <!--  -->
+            <!--  -->
+            <!--  -->
+            <!--  -->
+            <!-- Exhibit new -->
+            <!--  -->
+            <!--  -->
+            <!--  -->
+            <!--  -->
             <v-col class="d-flex align-center justify-center" cols="2">
               <v-dialog max-width="800" persistent>
                 <template v-slot:activator="{ props: openCreateNewWindow }">
@@ -274,17 +370,6 @@
                       clearable
                     ></v-textarea>
 
-                    <v-file-input
-                      class="new-name-bar mt-4 ml-10"
-                      v-model="orderattachment"
-                      label="Exhibit images..."
-                      :rules="[rules.required]"
-                      variant="underlined"
-                      clearable
-                      chips
-                      multiple
-                    ></v-file-input>
-
                     <v-checkbox
                       v-model="newDisplayed"
                       class="ml-10 top-checkbox-top-margin"
@@ -293,6 +378,67 @@
                       color="#EB4511"
                       density="compact"
                     ></v-checkbox>
+
+                    <v-menu>
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          color="white"
+                          class="new-name-bar mt-4 ml-10"
+                        >
+                          {{ newToMuseum || "Select Museum" }}
+                        </v-btn>
+                      </template>
+
+                      <v-list>
+                        <v-list-item
+                          v-for="(item, index) in museumOptions"
+                          :key="index"
+                          @click="selectMuseum(item)"
+                        >
+                          <v-list-item-title>{{ item }}</v-list-item-title>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+
+                    <v-btn
+                      class="new-images-button mt-4 ml-10"
+                      @click="testUploadWidget"
+                    >
+                      Add Images
+                    </v-btn>
+
+                    <v-card
+                      class="new-images-carousel pa-4 ml-10 mt-4 flat"
+                    >
+                      <v-row class="flex-nowrap">
+                        <v-col
+                          v-for="(image, index) in newImagesHolder"
+                          :key="index"
+                          class="d-flex align-center"
+                          cols="auto"
+                        >
+                          <v-card
+                            :style="{
+                              backgroundImage: `url(${image})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                            }"
+                            width="300"
+                            height="169"
+                            class="image-card"
+                            @click="removeImage(index)"
+                          >
+                            <v-card-actions>
+                              <v-spacer></v-spacer>
+                              <v-btn icon @click.stop="removeImage(index)">
+                                <v-icon color="red">mdi-close</v-icon>
+                              </v-btn>
+                            </v-card-actions>
+                          </v-card>
+                        </v-col>
+                      </v-row>
+                    </v-card>
 
                     <v-card
                       v-if="showError"
@@ -303,7 +449,9 @@
                       color="#e89c9c"
                     >
                       <v-card-text>
-                        Adding the exhibit failed due to unspecified reasons. Check all the fields or if you believe this to be as error contact the system administrator.
+                        Adding the exhibit failed due to unspecified reasons.
+                        Check all the fields or if you believe this to be as
+                        error contact the system administrator.
                       </v-card-text>
                     </v-card>
 
@@ -324,10 +472,12 @@
                         <v-btn
                           class="mr-16"
                           color="secondary"
-                          @click="() => {
+                          @click="
+                            () => {
                               isActive.value = false;
                               onClosedDialogReset();
-                            }"
+                            }
+                          "
                         >
                           Close
                         </v-btn>
@@ -351,30 +501,42 @@ import { RouterLink, useRouter } from "vue-router";
 import { ref, onMounted, watch, computed } from "vue";
 import { usePiniaStorage } from "../store/index.js";
 import axios from "axios";
+import { Cloudinary } from "@cloudinary/url-gen";
 
 export default {
   data() {
     return {
       displayedExhibits: ref(true),
-      hiddenExhibits: ref(true)
-    }
+      hiddenExhibits: ref(true),
+      artExhibits: ref(true),
+      scienceExhibits: ref(true),
+      historyExhibits: ref(true),
+      techExhibits: ref(true),
+    };
   },
 
   setup() {
     // site setup i app bar
     const isMobile = ref(false);
     const isActive = ref(false);
+    const isActiveImages = ref(false);
     const displayedExhibits = ref(true);
     const hiddenExhibits = ref(true);
+    const artExhibits = ref(true);
+    const scienceExhibits = ref(true);
+    const historyExhibits = ref(true);
+    const techExhibits = ref(true);
     const search = ref("");
 
     // novi exhibiti
     const newTitle = ref("");
     const newDescription = ref("");
-    const base64Files = ref([]);
-    const orderattachment = ref([]);
+    const newImagesHolder = ref([]);
     const newDisplayed = ref(false);
+    const newToMuseum = ref("");
     const showError = ref(false);
+    const menu = ref(false);
+    const museumOptions = ["art", "science", "history", "technology"];
 
     // postojeci exhibiti
     const exhibits = ref([]);
@@ -383,6 +545,7 @@ export default {
     const exhibitImages = ref([]);
     const exhibitDisplayed = ref(false);
     const exhibitID = ref("");
+    const exhibitToMuseum = ref("");
 
     const piniaStorage = usePiniaStorage();
     const router = useRouter();
@@ -399,6 +562,7 @@ export default {
       window.addEventListener("resize", updateIsMobile);
 
       getAllExhibits();
+      console.log(newImagesHolder.value);
 
       return () => {
         window.removeEventListener("resize", updateIsMobile);
@@ -415,48 +579,129 @@ export default {
     };
 
     const onClosedDialogReset = () => {
-
       newTitle.value = "";
       newDescription.value = "";
-      orderattachment.value = [];
       newDisplayed.value = false;
-      base64Files.value = [];
+      newImagesHolder.value = [];
       showError.value = false;
+      newToMuseum.value = "";
     };
 
-    const printBase = async () => {
-      console.log(base64Files.value);
+    const onClosedDialogResetExisting = () => {
+      exhibitTitle.value = "";
+      exhibitDescription.value = "";
+      exhibitDisplayed.value = false;
+      exhibitImages.value = [];
+      showError.value = false;
+      exhibitToMuseum.value = "";
     };
 
-    watch(orderattachment, (files) => {
-      base64Files.value = [];
-      if (!files.length) return;
+    const selectMuseum = (item) => {
+      newToMuseum.value = item;
+      menu.value = false;
+    };
 
-      files.forEach(file => {
-        let fr = new FileReader();
-        fr.addEventListener("load", (e) => {
-          base64Files.value.push(e.target.result);
-        });
-        fr.addEventListener("error", (e) => {
-          console.error(`Error reading file ${file.name}:`, e);
-        });
-        fr.readAsDataURL(file);
-      });
+    const selectModifyExhibitMuseum = (item) => {
+      exhibitToMuseum.value = item;
+      menu.value = false;
+    };
+
+    const filteredExhibits = computed(() => {
+      let filtered = exhibits.value;
+
+      if (!displayedExhibits.value && hiddenExhibits.value) {
+        filtered = filtered.filter((exhibit) => !exhibit.isDisplayed);
+      } else if (displayedExhibits.value && !hiddenExhibits.value) {
+        filtered = filtered.filter((exhibit) => exhibit.isDisplayed);
+      } else if (!displayedExhibits.value && !hiddenExhibits.value) {
+        return [];
+      }
+
+      if (!artExhibits.value) {
+        filtered = filtered.filter((exhibit) => exhibit.toMuseum !== "art");
+      }
+      if (!scienceExhibits.value) {
+        filtered = filtered.filter((exhibit) => exhibit.toMuseum !== "science");
+      }
+      if (!historyExhibits.value) {
+        filtered = filtered.filter((exhibit) => exhibit.toMuseum !== "history");
+      }
+      if (!techExhibits.value) {
+        filtered = filtered.filter(
+          (exhibit) => exhibit.toMuseum !== "technology"
+        );
+      }
+
+      if (search.value) {
+        const query = search.value.toLowerCase();
+        filtered = filtered.filter((exhibit) =>
+          exhibit.exhibitName.toLowerCase().includes(query)
+        );
+      }
+
+      return filtered;
     });
-// 
-// 
-//       POZIV RUTA
-// 
-// 
 
+    const testUploadWidget = async () => {
+      const myWidget = cloudinary.createUploadWidget(
+        {
+          cloudName: "dkzpi7xpb",
+          uploadPreset: "indelect",
+          multiple: true,
+        },
+        (error, result) => {
+          if (!error && result && result.event === "success") {
+            console.log("Done! Here is the image info: ", result.info);
 
+            newImagesHolder.value.push(result.info.secure_url);
+            console.log(newImagesHolder.value);
+          }
+        }
+      );
+
+      myWidget.open();
+    };
+
+    const testUploadWidgetExisting = async () => {
+      const myWidget = cloudinary.createUploadWidget(
+        {
+          cloudName: "dkzpi7xpb",
+          uploadPreset: "indelect",
+          multiple: true,
+        },
+        (error, result) => {
+          if (!error && result && result.event === "success") {
+            console.log("Done! Here is the image info: ", result.info);
+
+            exhibitImages.value.push(result.info.secure_url);
+            console.log(exhibitImages.value);
+          }
+        }
+      );
+
+      myWidget.open();
+    };
+
+    const removeImage = (index) => {
+      newImagesHolder.value.splice(index, 1);
+    };
+
+    const removeImageExisting = (index) => {
+      exhibitImages.value.splice(index, 1);
+    };
+    //
+    //
+    //       POZIV RUTA
+    //
+    //
     const newExhibit = async () => {
       showError.value = false;
 
       if (
         !newTitle.value ||
         !newDescription.value ||
-        !base64Files.value
+        !newImagesHolder.value ||
+        !newToMuseum.value
       ) {
         console.error("All fields are required");
         showError.value = true;
@@ -466,8 +711,9 @@ export default {
         const response = await axios.post("/exhibit/add", {
           exhibitName: newTitle.value,
           description: newDescription.value,
-          images: base64Files.value,
-          isDisplayed: newDisplayed.value
+          images: newImagesHolder.value,
+          isDisplayed: newDisplayed.value,
+          toMuseum: newToMuseum.value,
         });
 
         onClosedDialogReset();
@@ -495,13 +741,19 @@ export default {
       exhibitDescription.value = exhibit.description;
       exhibitImages.value = exhibit.images;
       exhibitDisplayed.value = exhibit.isDisplayed;
+      exhibitToMuseum.value = exhibit.toMuseum;
       exhibitID.value = exhibit._id;
     };
 
     const updateExhibit = async () => {
       showError.value = false;
 
-      if (!exhibitID.value || !exhibitTitle.value || !exhibitDescription.value) {
+      if (
+        !exhibitID.value ||
+        !exhibitTitle.value ||
+        !exhibitDescription.value ||
+        !exhibitToMuseum.value
+      ) {
         console.error("All fields are required");
         showError.value = true;
       }
@@ -509,10 +761,14 @@ export default {
       const updateData = {
         exhibitName: exhibitTitle.value,
         description: exhibitDescription.value,
-        images: base64Files.value,
+        images: exhibitImages.value,
         isDisplayed: exhibitDisplayed.value,
+        toMuseum: exhibitToMuseum.value,
       };
-      console.log('Sending update request with data:', { id: exhibitID.value, updateData });
+      console.log("Sending update request with data:", {
+        id: exhibitID.value,
+        updateData,
+      });
 
       try {
         const response = await axios.post("/exhibit/update", {
@@ -520,7 +776,7 @@ export default {
           updateData,
         });
 
-        onClosedDialogReset();
+        onClosedDialogResetExisting();
         await getAllExhibits();
         console.log("Update successful:", response.data);
       } catch (error) {
@@ -534,58 +790,61 @@ export default {
       console.log(exhibitID.value);
       try {
         const response = await axios.delete("/exhibit/delete", {
-          data: { id: exhibitID.value }
+          data: { id: exhibitID.value },
         });
 
-        onClosedDialogReset();
+        onClosedDialogResetExisting();
         await getAllExhibits();
         console.log("Delete successful:", response.data);
+        
       } catch (error) {
         console.error("Deleting exhibit failed:", error);
         showError.value = true;
       }
     };
 
-    const filteredExhibits = computed(() => {
-      if (displayedExhibits.value && hiddenExhibits.value) {
-        return exhibits.value;
-      } else if (displayedExhibits.value && !hiddenExhibits.value) {
-        return exhibits.value.filter(exhibit => exhibit.isDisplayed);
-      } else if (!displayedExhibits.value && hiddenExhibits.value) {
-        return exhibits.value.filter(exhibit => !exhibit.isDisplayed);
-      } else {
-        return [];
-      }
-  });
- 
     return {
       isMobile,
       displayedExhibits,
       hiddenExhibits,
+      artExhibits,
+      scienceExhibits,
+      historyExhibits,
+      techExhibits,
       exhibits,
       filteredExhibits,
       rules,
       logout,
       newTitle,
       newDescription,
-      base64Files,
-      orderattachment,
+      newImagesHolder,
       newDisplayed,
+      newToMuseum,
+      menu,
+      museumOptions,
+      selectMuseum,
       newExhibit,
       watch,
-      printBase,
       onClosedDialogReset,
+      onClosedDialogResetExisting,
       showError,
       getAllExhibits,
       exhibitTitle,
       exhibitDescription,
       exhibitImages,
       exhibitDisplayed,
+      exhibitToMuseum,
+      selectModifyExhibitMuseum,
       loadExhibitData,
       updateExhibit,
       deleteExhibit,
       isActive,
+      isActiveImages,
       search,
+      testUploadWidget,
+      testUploadWidgetExisting,
+      removeImage,
+      removeImageExisting,
     };
   },
 };
@@ -658,5 +917,20 @@ export default {
   width: 100%;
   background: rgba(0, 0, 0, 0.4);
   padding: 10px 0;
+}
+
+.new-images-button {
+  width: 90%;
+}
+
+.new-images-carousel {
+  overflow-x: auto;
+  width: 90%;
+}
+
+.image-card {
+  cursor: pointer;
+  position: relative;
+  background-color: #f5f5f5;
 }
 </style>
