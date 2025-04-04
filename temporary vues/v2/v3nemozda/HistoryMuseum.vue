@@ -1,3 +1,4 @@
+<!-- HistoryMuseum -->
 <template>
   <v-app>
     <!-- Navigation and App Bar -->
@@ -47,10 +48,10 @@
     <!-- Main Content -->
     <v-container>
       <v-card class="pa-4" outlined>
-        <h1 class="mt-4 mb-4 text-center">Welcome to the Art Museum Map</h1>
+        <h1 class="mt-4 mb-4 text-center">Welcome to the History Museum Map</h1>
         <div class="map-container">
           <!-- Museum Map Image -->
-          <img src="../assets/mapa4.png" alt="Museum Map" class="map-image" />
+          <img src="../assets/mapa2.png" alt="Museum Map" class="map-image" />
         </div>
       </v-card>
 
@@ -134,7 +135,7 @@ export default {
         const response = await axios.get("/exhibit/getall");
         exhibits.value = response.data;
         // Filter science exhibits
-        scienceExhibits.value = exhibits.value.filter(exhibit => exhibit.toMuseum === "art");
+        scienceExhibits.value = exhibits.value.filter(exhibit => exhibit.toMuseum === "history");
       } catch (error) {
         console.error("Getting exhibits failed:", error);
       }

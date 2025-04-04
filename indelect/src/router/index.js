@@ -6,13 +6,8 @@ import SignUp from "../views/Signup.vue";
 import WrongDev from "../views/WrongDev.vue";
 import CMSHome from "../views/CMSHome.vue";
 import NoAccessDev from "../views/NoAccessDev.vue";
-import TicketList from "../views/TicketList.vue";
-import Payment from "../views/Payment.vue";
-import Science from "../views/ScienceMuseum.vue";
-import Art from "../views/ArtMuseum.vue";
-import HistoryMuseum from "../views/HistoryMuseum.vue";
-import Tech from "../views/TechnologyMuseum.vue";
-
+import Museum from "../views/Museum.vue";
+import Tickets from "../views/Tickets.vue";
 
 
 
@@ -47,40 +42,15 @@ const router = createRouter({
       component: SignUp,
     },
     {
-      path: "/map/Science Museum",
-      name: "Science Museum",
-      component: Science ,
+      path: '/map/:museumType/:userEmail?',
+      name: 'museum',
+      component: Museum,
+      meta: { requiresAuth: true }
     },
     {
-      path: "/map/Art Museum",
-      name: "Art Museum",
-      component: Art ,
-    },
-    {
-      path: "/map/History Museum",
-      name: "History Museum",
-      component: HistoryMuseum ,
-    },
-    {
-      path: "/map/Technology Museum",
-      name: "Technology Museum",
-      component: Tech ,
-    },
-    
-    {
-      path: "/ticketlist",
-      name: "ticketlist",
-      component: TicketList,
-    },
-    {
-      path: "/payment",
-      name: "payment",
-      component: Payment,
-    },
-    {
-      path: "/payment/:MuseumName", 
-      name: "payment",
-      component: () => import("../views/Payment.vue"),  
+      path: '/tickets',
+      name: 'tickets',
+      component: Tickets
     },
   ],
 });

@@ -1,3 +1,4 @@
+<!-- ScienceMuseum -->
 <template>
   <v-app>
     <!-- Navigation and App Bar -->

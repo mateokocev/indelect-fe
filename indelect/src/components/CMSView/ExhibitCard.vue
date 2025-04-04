@@ -129,7 +129,7 @@
 </template>
 
 <script>
-import ImageUploader from './ImageUploader.vue';
+import ImageUploader from '../CMSView/ImageUploader.vue';
 
 export default {
   name: 'ExhibitCard',

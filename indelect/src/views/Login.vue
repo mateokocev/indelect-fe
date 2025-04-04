@@ -260,7 +260,7 @@ export default {
         } else if (piniaStorage.getAdmin && !isMobile.value) {
           router.push({ name: "cmshome" });
         } else if (!piniaStorage.getAdmin && isMobile.value) {
-          router.push({ name: "ticketlist" });
+          router.push({ name: "tickets" });
         }
       } catch (error) {
         console.error("Login failed:", error);

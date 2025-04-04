@@ -1,3 +1,4 @@
+<!-- ArtMuseum -->
 <template>
   <v-app>
     <!-- Navigation and App Bar -->
@@ -15,7 +16,7 @@
           @click.stop="drawer = !drawer"
           class="btn-fix"
         ></v-app-bar-nav-icon>
-        <v-toolbar-title>{{ museumTitle }}</v-toolbar-title>
+        <v-toolbar-title>Indelect</v-toolbar-title>
       </v-app-bar>
 
       <!-- Navigation Drawer -->
@@ -26,7 +27,8 @@
         app
       >
         <v-list-item class="px-4">
-          <v-list-item-title>Username: {{ userName }}</v-list-item-title>
+          <v-list-item-title >Username: {{ userName }}</v-list-item-title>
+          
         </v-list-item>
         <v-divider></v-divider>
         <v-list dense>
@@ -46,19 +48,19 @@
     <!-- Main Content -->
     <v-container>
       <v-card class="pa-4" outlined>
-        <h1 class="mt-4 mb-4 text-center">Welcome to the {{ museumTitle }}</h1>
+        <h1 class="mt-4 mb-4 text-center">Welcome to the Art Museum Map</h1>
         <div class="map-container">
           <!-- Museum Map Image -->
-          <img :src="museumMap" alt="Museum Map" class="map-image" />
+          <img src="../assets/mapa4.png" alt="Museum Map" class="map-image" />
         </div>
       </v-card>
 
       <!-- Exhibit Buttons Container -->
       <v-card class="pa-4 mt-4" outlined>
         <h2 class="text-center mb-4">Exhibit Pieces</h2>
-        <!-- Loop to create a button for each exhibit -->
+        <!-- Loop to create a button for each science exhibit -->
         <div class="exhibit-buttons-container">
-          <div v-for="exhibit in filteredExhibits" :key="exhibit._id" class="mb-2">
+          <div v-for="exhibit in scienceExhibits" :key="exhibit._id" class="mb-2">
             <v-btn
               color="primary"
               class="rounded-btn"
@@ -70,7 +72,7 @@
         </div>
       </v-card>
 
-      <!-- Dialog for Exhibit Images -->
+      <!-- Dialog for Science Museum Images -->
       <v-dialog max-width="500" v-model="dialogVisible">
         <v-card>
           <v-card-title>
@@ -80,7 +82,7 @@
           <v-card-text>
             <p>{{ selectedItem.description }}</p>
             <div v-for="(image, imgIndex) in selectedItem.images" :key="imgIndex">
-              <v-img :src="image" alt="Exhibit Image"></v-img>
+              <v-img :src="image" alt="Science Image"></v-img>
             </div>
           </v-card-text>
 
@@ -107,10 +109,8 @@ export default {
     const router = useRouter();
     const exhibits = ref([]);
     const selectedItem = ref(null);
+    const scienceExhibits = ref([]);
     const dialogVisible = ref(false);
-    const museumType = ref(router.currentRoute.value.params.museum); // Get museum type from route params
-    const museumTitle = ref(""); // Dynamic museum title
-    const museumMap = ref(""); // Dynamic museum map image
 
     const updateIsMobile = () => {
       isMobile.value = window.innerWidth <= 480;
@@ -122,7 +122,6 @@ export default {
     onMounted(() => {
       updateIsMobile();
       getAllExhibits();
-      setMuseumDetails();
 
       window.addEventListener("resize", updateIsMobile);
       getUsername();
@@ -131,49 +130,16 @@ export default {
       };
     });
 
-    const setMuseumDetails = () => {
-      switch (museumType.value) {
-        case "science":
-          museumTitle.value = "Science Museum";
-          museumMap.value = require("../assets/science_map.png");
-          break;
-        case "art":
-          museumTitle.value = "Art Museum";
-          museumMap.value = require("../assets/art_map.png");
-          break;
-        case "history":
-          museumTitle.value = "History Museum";
-          museumMap.value = require("../assets/history_map.png");
-          break;
-        case "technology":
-          museumTitle.value = "Technology Museum";
-          museumMap.value = require("../assets/technology_map.png");
-          break;
-        default:
-          museumTitle.value = "Museum";
-          museumMap.value = "";
-      }
-    };
-
     const getAllExhibits = async () => {
       try {
         const response = await axios.get("/exhibit/getall");
         exhibits.value = response.data;
+        // Filter science exhibits
+        scienceExhibits.value = exhibits.value.filter(exhibit => exhibit.toMuseum === "art");
       } catch (error) {
         console.error("Getting exhibits failed:", error);
       }
     };
-
-    const filteredExhibits = ref([]);
-
-    watch(
-      () => exhibits.value,
-      () => {
-        filteredExhibits.value = exhibits.value.filter(
-          (exhibit) => exhibit.toMuseum === museumType.value
-        );
-      }
-    );
 
     const openDialog = (exhibit) => {
       selectedItem.value = exhibit;
@@ -194,21 +160,30 @@ export default {
       router.push({ name: "login" });
     };
 
+    const handleAction1 = () => {
+      // Implement your action 1 logic
+    };
+
+    const handleAction2 = () => {
+      // Implement your action 2 logic
+    };
+
     return {
       isMobile,
       drawer,
       userName,
       selectedItem,
+      scienceExhibits,
       dialogVisible,
       openDialog,
       logout,
-      filteredExhibits,
-      museumTitle,
-      museumMap,
+      handleAction1,
+      handleAction2
     };
   },
 };
 </script>
+
 
 <style>
 /* General styling */

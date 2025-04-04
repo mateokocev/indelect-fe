@@ -33,8 +33,8 @@
   import { usePiniaStorage } from "../store/index.js";
   import axios from "axios";
 
-  import AppHeader from '../components/AppHeader.vue';
-  import ExhibitGrid from '../components/ExhibitGrid.vue';
+  import AppHeader from '../components/CMSView/AppHeader.vue';
+  import ExhibitGrid from '../components/CMSView/ExhibitGrid.vue';
 
   export default {
     name: 'CMSHome',
@@ -62,11 +62,9 @@
       const piniaStorage = usePiniaStorage();
       const router = useRouter();
 
-      // Computed properties
       const filteredExhibits = computed(() => {
         let filtered = exhibits.value;
 
-        // Filter by display status
         if (!filters.value.displayedExhibits && filters.value.hiddenExhibits) {
           filtered = filtered.filter((exhibit) => !exhibit.isDisplayed);
         } else if (filters.value.displayedExhibits && !filters.value.hiddenExhibits) {
