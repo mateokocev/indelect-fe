@@ -42,46 +42,46 @@
 </template>
 
 <script>
-export default {
-  props: {
-    drawer: {
-      type: Boolean,
-      required: true
-    },
-    mini: {
-      type: Boolean,
-      required: true
-    },
-    extended: {
-      type: Boolean,
-      default: false
-    },
-    userName: {
-      type: String,
-      default: ''
-    }
-  },
-  emits: ['toggle-drawer', 'update:drawer', 'logout'],
-  computed: {
-    internalDrawer: {
-      get() {
-        return this.drawer;
+  export default {
+    props: {
+      drawer: {
+        type: Boolean,
+        required: true
       },
-      set(val) {
-        this.$emit('update:drawer', val);
+      mini: {
+        type: Boolean,
+        required: true
+      },
+      extended: {
+        type: Boolean,
+        default: false
+      },
+      userName: {
+        type: String,
+        default: ''
+      }
+    },
+    emits: ['toggle-drawer', 'update:drawer', 'logout'],
+    computed: {
+      internalDrawer: {
+        get() {
+          return this.drawer;
+        },
+        set(val) {
+          this.$emit('update:drawer', val);
+        }
       }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
-.fixed-drawer {
-  position: fixed;
-  top: 64px;
-  left: 0;
-  height: calc(100% - 64px);
-  z-index: 1000;
-  overflow-y: auto;
-}
+  .fixed-drawer {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    height: calc(100% - 64px);
+    z-index: 1000;
+    overflow-y: auto;
+  }
 </style>

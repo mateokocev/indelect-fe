@@ -67,89 +67,89 @@
 </template>
 
 <script>
-export default {
-  props: {
-    visible: {
-      type: Boolean,
-      required: true
-    },
-    museumName: {
-      type: String,
-      default: ''
-    },
-    price: {
-      type: [Number, String],
-      default: 0
-    }
-  },
-  data() {
-    return {
-      valid: false,
-      cardNumber: '',
-      expiryDate: '',
-      cvv: '',
-      cardholderName: '',
-      processing: false,
-      cardNumberRules: [
-        v => !!v || 'Card number is required',
-        v => (v && v.replace(/\s/g, '').length === 16) || 'Card number must be 16 digits'
-      ],
-      expiryDateRules: [
-        v => !!v || 'Expiry date is required',
-        v => (v && /^\d{2}\/\d{2}$/.test(v)) || 'Expiry date must be in MM/YY format'
-      ],
-      cvvRules: [
-        v => !!v || 'CVV is required',
-        v => (v && v.length === 3) || 'CVV must be 3 digits'
-      ],
-      nameRules: [
-        v => !!v || 'Cardholder name is required',
-        v => (v && v.length >= 3) || 'Name must be at least 3 characters'
-      ]
-    }
-  },
-  emits: ['update:visible', 'payment-successful', 'payment-failed'],
-  computed: {
-    internalVisible: {
-      get() {
-        return this.visible;
+  export default {
+    props: {
+      visible: {
+        type: Boolean,
+        required: true
       },
-      set(val) {
-        this.$emit('update:visible', val);
-      }
-    }
-  },
-  methods: {
-    formatCardNumber(value) {
-      if (typeof value !== 'string') return;
-      let v = value.replace(/\D/g, '');
-      this.cardNumber = v.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
-    },
-    formatExpiryDate(value) {
-      if (typeof value !== 'string') return;
-      let v = value.replace(/\D/g, '');
-      if (v.length > 2) {
-        this.expiryDate = v.substring(0, 2) + '/' + v.substring(2, 4);
-      } else {
-        this.expiryDate = v;
+      museumName: {
+        type: String,
+        default: ''
+      },
+      price: {
+        type: [Number, String],
+        default: 0
       }
     },
-    processPayment() {
-      if (!this.$refs.form.validate()) {
-        return;
+    data() {
+      return {
+        valid: false,
+        cardNumber: '',
+        expiryDate: '',
+        cvv: '',
+        cardholderName: '',
+        processing: false,
+        cardNumberRules: [
+          v => !!v || 'Card number is required',
+          v => (v && v.replace(/\s/g, '').length === 16) || 'Card number must be 16 digits'
+        ],
+        expiryDateRules: [
+          v => !!v || 'Expiry date is required',
+          v => (v && /^\d{2}\/\d{2}$/.test(v)) || 'Expiry date must be in MM/YY format'
+        ],
+        cvvRules: [
+          v => !!v || 'CVV is required',
+          v => (v && v.length === 3) || 'CVV must be 3 digits'
+        ],
+        nameRules: [
+          v => !!v || 'Cardholder name is required',
+          v => (v && v.length >= 3) || 'Name must be at least 3 characters'
+        ]
       }
-      this.processing = true;
-      setTimeout(() => {
-        this.processing = false;
-        this.$emit('payment-successful');
+    },
+    emits: ['update:visible', 'payment-successful', 'payment-failed'],
+    computed: {
+      internalVisible: {
+        get() {
+          return this.visible;
+        },
+        set(val) {
+          this.$emit('update:visible', val);
+        }
+      }
+    },
+    methods: {
+      formatCardNumber(value) {
+        if (typeof value !== 'string') return;
+        let v = value.replace(/\D/g, '');
+        this.cardNumber = v.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+      },
+      formatExpiryDate(value) {
+        if (typeof value !== 'string') return;
+        let v = value.replace(/\D/g, '');
+        if (v.length > 2) {
+          this.expiryDate = v.substring(0, 2) + '/' + v.substring(2, 4);
+        } else {
+          this.expiryDate = v;
+        }
+      },
+      processPayment() {
+        if (!this.$refs.form.validate()) {
+          return;
+        }
+        this.processing = true;
+        setTimeout(() => {
+          this.processing = false;
+          this.$emit('payment-successful');
+          this.internalVisible = false;
+        }, 1500);
+      },
+      closeDialog() {
         this.internalVisible = false;
-      }, 1500);
-    },
-    closeDialog() {
-      this.internalVisible = false;
+      }
     }
   }
-}
 </script>
 
 <style scoped>

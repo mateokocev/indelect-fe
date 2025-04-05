@@ -203,111 +203,111 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
-import { RouterLink, useRouter } from "vue-router";
-import axios from "axios";
+  import { ref, onMounted } from "vue";
+  import { RouterLink, useRouter } from "vue-router";
+  import axios from "axios";
 
-export default {
-  setup() {
-    const isMobile = ref(false);
-    const email = ref("");
-    const password = ref("");
-    const username = ref("");
-    const visible = ref(false);
-    const isLoading = ref(false);
-    const showEmpty = ref(false);
-    const showError = ref(false);
+  export default {
+    setup() {
+      const isMobile = ref(false);
+      const email = ref("");
+      const password = ref("");
+      const username = ref("");
+      const visible = ref(false);
+      const isLoading = ref(false);
+      const showEmpty = ref(false);
+      const showError = ref(false);
 
-    const router = useRouter();
+      const router = useRouter();
 
-    onMounted(() => {
-      const updateIsMobile = () => {
-        isMobile.value = window.innerWidth <= 480;
+      onMounted(() => {
+        const updateIsMobile = () => {
+          isMobile.value = window.innerWidth <= 480;
+        };
+
+        updateIsMobile();
+        window.addEventListener("resize", updateIsMobile);
+
+        return () => {
+          window.removeEventListener("resize", updateIsMobile);
+        };
+      });
+
+      const rules = {
+        email: (v) =>
+          !!v.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) ||
+          "Please enter a valid email",
+        length: (len) => (v) =>
+          (v || "").length >= len || `Invalid character length, required ${len}`,
+        password: (v) =>
+          !!v.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) ||
+          "Password must contain an upper case letter, a numeric character, and a special character",
+        required: (v) => !!v || "This field is required",
       };
 
-      updateIsMobile();
-      window.addEventListener("resize", updateIsMobile);
-
-      return () => {
-        window.removeEventListener("resize", updateIsMobile);
+      const hashPassword = async (password) => {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hash = await crypto.subtle.digest("SHA-256", data);
+        return Array.from(new Uint8Array(hash))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
       };
-    });
 
-    const rules = {
-      email: (v) =>
-        !!v.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) ||
-        "Please enter a valid email",
-      length: (len) => (v) =>
-        (v || "").length >= len || `Invalid character length, required ${len}`,
-      password: (v) =>
-        !!v.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) ||
-        "Password must contain an upper case letter, a numeric character, and a special character",
-      required: (v) => !!v || "This field is required",
-    };
+      const register = async () => {
+        showError.value = false;
+        showEmpty.value = false;
 
-    const hashPassword = async (password) => {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hash = await crypto.subtle.digest("SHA-256", data);
-      return Array.from(new Uint8Array(hash))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-    };
+        if (!username.value || !email.value || !password.value) {
+          console.error("All fields are required");
+          showEmpty.value = true;
+          return;
+        }
 
-    const register = async () => {
-      showError.value = false;
-      showEmpty.value = false;
+        isLoading.value = true;
 
-      if (!username.value || !email.value || !password.value) {
-        console.error("All fields are required");
-        showEmpty.value = true;
-        return;
-      }
+        try {
+          const hashedPassword = await hashPassword(password.value);
+          const response = await axios.post("/register", {
+            username: username.value,
+            email: email.value,
+            password: hashedPassword,
+          });
+          console.log("Registration successful:", response.data);
+          router.push({ name: 'login' });
+        } catch (error) {
+          console.error("Registration failed. Wompy Dompy:", error);
+          showError.value = true;
+        } finally {
+          isLoading.value = false;
+        }
+      };
 
-      isLoading.value = true;
-
-      try {
-        const hashedPassword = await hashPassword(password.value);
-        const response = await axios.post("/register", {
-          username: username.value,
-          email: email.value,
-          password: hashedPassword,
-        });
-        console.log("Registration successful:", response.data);
-        router.push({ name: 'login' });
-      } catch (error) {
-        console.error("Registration failed. Wompy Dompy:", error);
-        showError.value = true;
-      } finally {
-        isLoading.value = false;
-      }
-    };
-
-    return {
-      isMobile,
-      email,
-      password,
-      username,
-      visible,
-      isLoading,
-      rules,
-      register,
-      showEmpty,
-      showError,
-    };
-  },
-};
+      return {
+        isMobile,
+        email,
+        password,
+        username,
+        visible,
+        isLoading,
+        rules,
+        register,
+        showEmpty,
+        showError,
+      };
+    },
+  };
 </script>
 
 <style scoped>
-.center-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+  .center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
 
-.no-underline {
-  text-decoration: none;
-}
+  .no-underline {
+    text-decoration: none;
+  }
 </style>

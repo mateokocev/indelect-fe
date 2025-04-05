@@ -258,11 +258,12 @@
         showWarningDialog.value = false;
       };
       
-      const useTicket = (museumName) => {
-        router.push({ name: 'museum', params: { museumName: museumName.toLowerCase() } });
+      const useTicket = (museumName, qrCodeUrl) => {
+        console.log(qrCodeUrl);
+        const museumType = museumName.replace(/museum/gi, '').trim().toLowerCase();
+        router.push({ name: 'Museum', params: { museumType }, query: { qrCode: qrCodeUrl } });
       };
 
-      // Use the Pinia store for auth logout
       const piniaStorage = usePiniaStorage();
       const logout = async () => {
         await piniaStorage.clearAuthData();

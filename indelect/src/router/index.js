@@ -42,15 +42,16 @@ const router = createRouter({
       component: SignUp,
     },
     {
-      path: '/map/:museumType/:userEmail?',
-      name: 'museum',
+      path: '/museum/:museumType',
+      name: 'Museum',
       component: Museum,
       meta: { requiresAuth: true }
     },
     {
       path: '/tickets',
       name: 'tickets',
-      component: Tickets
+      component: Tickets,
+      meta: { requiresAuth: true }
     },
   ],
 });

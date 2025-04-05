@@ -79,9 +79,9 @@
       };
     }
   });
-  </script>
+</script>
 
-  <style scoped>
+<style scoped>
   .ticket-card {
     transition: all 0.3s ease;
     border-radius: 8px;

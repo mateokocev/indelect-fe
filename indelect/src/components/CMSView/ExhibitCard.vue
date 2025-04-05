@@ -129,149 +129,149 @@
 </template>
 
 <script>
-import ImageUploader from '../CMSView/ImageUploader.vue';
+  import ImageUploader from '../CMSView/ImageUploader.vue';
 
-export default {
-  name: 'ExhibitCard',
-  components: {
-    ImageUploader
-  },
-  props: {
-    exhibit: {
-      type: Object,
-      required: true
+  export default {
+    name: 'ExhibitCard',
+    components: {
+      ImageUploader
     },
-    museumOptions: {
-      type: Array,
-      default: () => ["art", "science", "history", "technology"]
-    }
-  },
-  data() {
-    return {
-      dialog: false,
-      exhibitData: {
-        id: '',
-        title: '',
-        description: '',
-        images: [],
-        displayed: false,
-        toMuseum: ''
+    props: {
+      exhibit: {
+        type: Object,
+        required: true
       },
-      showError: false,
-      rules: {
-        required: v => !!v || 'This field is required'
+      museumOptions: {
+        type: Array,
+        default: () => ["art", "science", "history", "technology"]
       }
-    };
-  },
-  created() {
-    this.initializeData();
-  },
-  watch: {
-    exhibit: {
-      handler() {
-        this.initializeData();
-      },
-      deep: true
-    }
-  },
-  methods: {
-    openDialog() {
-      this.$emit('load-exhibit', this.exhibit);
-      this.dialog = true;
     },
-    closeDialog() {
-      this.dialog = false;
-      this.resetForm();
-      this.$emit('refresh');
-    },
-    initializeData() {
-      this.exhibitData = {
-        id: this.exhibit._id,
-        title: this.exhibit.exhibitName,
-        description: this.exhibit.description,
-        images: [...this.exhibit.images],
-        displayed: this.exhibit.isDisplayed,
-        toMuseum: this.exhibit.toMuseum
+    data() {
+      return {
+        dialog: false,
+        exhibitData: {
+          id: '',
+          title: '',
+          description: '',
+          images: [],
+          displayed: false,
+          toMuseum: ''
+        },
+        showError: false,
+        rules: {
+          required: v => !!v || 'This field is required'
+        }
       };
     },
-    resetForm() {
-      this.showError = false;
+    created() {
       this.initializeData();
     },
-    onUploadImages(newImages) {
-      this.exhibitData.images.push(...newImages);
-    },
-    removeImage(index) {
-      this.exhibitData.images.splice(index, 1);
-    },
-    updateExhibit() {
-      if (!this.validateForm()) {
-        this.showError = true;
-        return;
+    watch: {
+      exhibit: {
+        handler() {
+          this.initializeData();
+        },
+        deep: true
       }
-      
-      const updateData = {
-        exhibitName: this.exhibitData.title,
-        description: this.exhibitData.description,
-        images: this.exhibitData.images,
-        isDisplayed: this.exhibitData.displayed,
-        toMuseum: this.exhibitData.toMuseum
-      };
-      
-      this.$emit('update-exhibit', this.exhibitData.id, updateData);
-      
-      this.$emit('refresh');
-      
-      this.dialog = false;
-      this.resetForm();
     },
-    deleteExhibit() {
-      this.$emit('delete-exhibit', this.exhibitData.id);
-    },
-    validateForm() {
-      return this.exhibitData.title && 
-             this.exhibitData.description && 
-             this.exhibitData.toMuseum;
+    methods: {
+      openDialog() {
+        this.$emit('load-exhibit', this.exhibit);
+        this.dialog = true;
+      },
+      closeDialog() {
+        this.dialog = false;
+        this.resetForm();
+        this.$emit('refresh');
+      },
+      initializeData() {
+        this.exhibitData = {
+          id: this.exhibit._id,
+          title: this.exhibit.exhibitName,
+          description: this.exhibit.description,
+          images: [...this.exhibit.images],
+          displayed: this.exhibit.isDisplayed,
+          toMuseum: this.exhibit.toMuseum
+        };
+      },
+      resetForm() {
+        this.showError = false;
+        this.initializeData();
+      },
+      onUploadImages(newImages) {
+        this.exhibitData.images.push(...newImages);
+      },
+      removeImage(index) {
+        this.exhibitData.images.splice(index, 1);
+      },
+      updateExhibit() {
+        if (!this.validateForm()) {
+          this.showError = true;
+          return;
+        }
+        
+        const updateData = {
+          exhibitName: this.exhibitData.title,
+          description: this.exhibitData.description,
+          images: this.exhibitData.images,
+          isDisplayed: this.exhibitData.displayed,
+          toMuseum: this.exhibitData.toMuseum
+        };
+        
+        this.$emit('update-exhibit', this.exhibitData.id, updateData);
+        
+        this.$emit('refresh');
+        
+        this.dialog = false;
+        this.resetForm();
+      },
+      deleteExhibit() {
+        this.$emit('delete-exhibit', this.exhibitData.id);
+      },
+      validateForm() {
+        return this.exhibitData.title && 
+              this.exhibitData.description && 
+              this.exhibitData.toMuseum;
+      }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
-.horizontal-addnew-title-separator {
-  height: 1px;
-  width: 90%;
-  align-self: center;
-  background-color: #eb4511;
-  margin-top: 6px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-}
+  .horizontal-addnew-title-separator {
+    height: 1px;
+    width: 90%;
+    align-self: center;
+    background-color: #eb4511;
+    margin-top: 6px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
 
-.new-name-bar {
-  max-width: 90%;
-}
+  .new-name-bar {
+    max-width: 90%;
+  }
 
-.top-checkbox-top-margin {
-  margin-top: 22px;
-}
+  .top-checkbox-top-margin {
+    margin-top: 22px;
+  }
 
-.exhibit-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  text-align: center;
-  font-size: 15px;
-  font-weight: bold;
-}
+  .exhibit-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+  }
 
-.exhibit-btn .v-card-title {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 10px 0;
-}
+  .exhibit-btn .v-card-title {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 0;
+  }
 </style>

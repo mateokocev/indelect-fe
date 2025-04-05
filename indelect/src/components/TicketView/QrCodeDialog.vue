@@ -14,7 +14,7 @@
         <v-btn color="#B02E0C" text @click="internalVisible = false">
           Close
         </v-btn>
-        <v-btn color="#EF866F" @click="$emit('use-ticket', museumName)">
+        <v-btn color="#EF866F" @click="$emit('use-ticket', museumName, qrCodeUrl)">
           Use Ticket
         </v-btn>
       </v-card-actions>
@@ -23,50 +23,50 @@
 </template>
 
 <script>
-export default {
-  props: {
-    visible: {
-      type: Boolean,
-      required: true
-    },
-    museumName: {
-      type: String,
-      default: ''
-    },
-    qrCodeUrl: {
-      type: String,
-      default: ''
-    },
-    purchaseDate: {
-      type: [Date, String, null],
-      default: null
-    }
-  },
-  emits: ['update:visible', 'use-ticket'],
-  computed: {
-    internalVisible: {
-      get() {
-        return this.visible;
+  export default {
+    props: {
+      visible: {
+        type: Boolean,
+        required: true
       },
-      set(val) {
-        this.$emit('update:visible', val);
+      museumName: {
+        type: String,
+        default: ''
+      },
+      qrCodeUrl: {
+        type: String,
+        default: ''
+      },
+      purchaseDate: {
+        type: [Date, String, null],
+        default: null
+      }
+    },
+    emits: ['update:visible', 'use-ticket'],
+    computed: {
+      internalVisible: {
+        get() {
+          return this.visible;
+        },
+        set(val) {
+          this.$emit('update:visible', val);
+        }
+      }
+    },
+    methods: {
+      formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
       }
     }
-  },
-  methods: {
-    formatDate(dateString) {
-      if (!dateString) return 'N/A';
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
   }
-}
 </script>
 
 <style scoped>

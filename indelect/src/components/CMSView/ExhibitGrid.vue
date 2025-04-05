@@ -25,9 +25,9 @@
         </v-col>
       </v-row>
     </v-container>
-  </template>
+</template>
     
-  <script>
+<script>
   import ExhibitCard from './ExhibitCard.vue';
   import AddExhibitButton from './AddExhibitButton.vue';
   
@@ -48,4 +48,4 @@
       }
     }
   };
-  </script>
+</script>

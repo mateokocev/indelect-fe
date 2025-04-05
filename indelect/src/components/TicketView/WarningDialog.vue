@@ -32,42 +32,42 @@
 </template>
 
 <script>
-export default {
-  props: {
-    visible: {
-      type: Boolean,
-      required: true
-    },
-    type: {
-      type: String,
-      default: 'error',
-      validator: (value) => ['error', 'already-owned'].includes(value)
-    },
-    museumName: {
-      type: String,
-      default: ''
-    }
-  },
-  emits: ['update:visible', 'view-my-tickets'],
-  computed: {
-    internalVisible: {
-      get() {
-        return this.visible;
+  export default {
+    props: {
+      visible: {
+        type: Boolean,
+        required: true
       },
-      set(val) {
-        this.$emit('update:visible', val);
+      type: {
+        type: String,
+        default: 'error',
+        validator: (value) => ['error', 'already-owned'].includes(value)
+      },
+      museumName: {
+        type: String,
+        default: ''
       }
     },
-    title() {
-      return this.type === 'already-owned'
-        ? 'Ticket Already Owned'
-        : 'Purchase Failed';
-    },
-    closeButtonText() {
-      return this.type === 'already-owned' ? 'Close' : 'OK';
+    emits: ['update:visible', 'view-my-tickets'],
+    computed: {
+      internalVisible: {
+        get() {
+          return this.visible;
+        },
+        set(val) {
+          this.$emit('update:visible', val);
+        }
+      },
+      title() {
+        return this.type === 'already-owned'
+          ? 'Ticket Already Owned'
+          : 'Purchase Failed';
+      },
+      closeButtonText() {
+        return this.type === 'already-owned' ? 'Close' : 'OK';
+      }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
