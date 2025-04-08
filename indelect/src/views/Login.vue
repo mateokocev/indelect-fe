@@ -174,126 +174,126 @@
 </template>
 
 <script>
-import { RouterLink, useRouter } from "vue-router";
-import { ref, onMounted } from "vue";
-import axios from "axios";
-import { usePiniaStorage } from "../store/index.js";
+  import { RouterLink, useRouter } from "vue-router";
+  import { ref, onMounted } from "vue";
+  import axios from "axios";
+  import { usePiniaStorage } from "../store/index.js";
 
-export default {
-  setup() {
-    const isMobile = ref(false);
-    const email = ref("");
-    const password = ref("");
-    const visible = ref(false);
-    const isLoading = ref(false);
-    const showError = ref(false);
-    const showEmpty = ref(false);
+  export default {
+    setup() {
+      const isMobile = ref(false);
+      const email = ref("");
+      const password = ref("");
+      const visible = ref(false);
+      const isLoading = ref(false);
+      const showError = ref(false);
+      const showEmpty = ref(false);
 
-    const piniaStorage = usePiniaStorage();
-    const router = useRouter();
+      const piniaStorage = usePiniaStorage();
+      const router = useRouter();
 
-    onMounted(() => {
-      const updateIsMobile = () => {
-        isMobile.value = window.innerWidth <= 480;
+      onMounted(() => {
+        const updateIsMobile = () => {
+          isMobile.value = window.innerWidth <= 480;
+        };
+
+        updateIsMobile();
+        window.addEventListener("resize", updateIsMobile);
+
+        return () => {
+          window.removeEventListener("resize", updateIsMobile);
+        };
+      });
+
+      const rules = {
+        email: (v) =>
+          !!v.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) ||
+          "Please enter a valid email",
+        length: (len) => (v) =>
+          (v || "").length >= len || `Invalid character length, required ${len}`,
+        password: (v) =>
+          !!v.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) ||
+          "Password must contain an upper case letter, a numeric character, and a special character",
+        required: (v) => !!v || "This field is required",
       };
 
-      updateIsMobile();
-      window.addEventListener("resize", updateIsMobile);
-
-      return () => {
-        window.removeEventListener("resize", updateIsMobile);
+      const hashPassword = async (password) => {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hash = await crypto.subtle.digest("SHA-256", data);
+        return Array.from(new Uint8Array(hash))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
       };
-    });
 
-    const rules = {
-      email: (v) =>
-        !!v.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) ||
-        "Please enter a valid email",
-      length: (len) => (v) =>
-        (v || "").length >= len || `Invalid character length, required ${len}`,
-      password: (v) =>
-        !!v.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/) ||
-        "Password must contain an upper case letter, a numeric character, and a special character",
-      required: (v) => !!v || "This field is required",
-    };
+      const login = async () => {
+        showError.value = false;
+        showEmpty.value = false;
 
-    const hashPassword = async (password) => {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hash = await crypto.subtle.digest("SHA-256", data);
-      return Array.from(new Uint8Array(hash))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-    };
-
-    const login = async () => {
-      showError.value = false;
-      showEmpty.value = false;
-
-      if (!email.value || !password.value) {
-        console.error("All fields are required");
-        showEmpty.value = true;
-        return;
-      }
-
-      isLoading.value = true;
-
-      try {
-        const hashedPassword = await hashPassword(password.value);
-
-        const response = await axios.post("/login", {
-          email: email.value,
-          password: hashedPassword,
-        });
-
-        console.log("Login successful:", response.data);
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("isAdmin", response.data.isAdmin);
-        localStorage.setItem("userEmail", email.value);
-        localStorage.setItem("User", email.value);
-        piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
-
-        if (piniaStorage.getAdmin && isMobile.value) {
-          router.push({ name: "warning" });
-        } else if (!piniaStorage.getAdmin && !isMobile.value) {
-          router.push({ name: "warning" });
-        } else if (piniaStorage.getAdmin && !isMobile.value) {
-          router.push({ name: "cmshome" });
-        } else if (!piniaStorage.getAdmin && isMobile.value) {
-          router.push({ name: "tickets" });
+        if (!email.value || !password.value) {
+          console.error("All fields are required");
+          showEmpty.value = true;
+          return;
         }
-      } catch (error) {
-        console.error("Login failed:", error);
-        showError.value = true;
-      } finally {
-        isLoading.value = false;
-      }
-    };
 
-    return {
-      isMobile,
-      email,
-      password,
-      visible,
-      isLoading,
-      rules,
-      login,
-      showError,
-      showEmpty,
-    };
-  },
-};
+        isLoading.value = true;
+
+        try {
+          const hashedPassword = await hashPassword(password.value);
+
+          const response = await axios.post("/login", {
+            email: email.value,
+            password: hashedPassword,
+          });
+
+          console.log("Login successful:", response.data);
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("isAdmin", response.data.isAdmin);
+          localStorage.setItem("userEmail", email.value);
+          localStorage.setItem("User", email.value);
+          piniaStorage.setAuthData(response.data.token, response.data.isAdmin);
+
+          if (piniaStorage.getAdmin && isMobile.value) {
+            router.push({ name: "warning" });
+          } else if (!piniaStorage.getAdmin && !isMobile.value) {
+            router.push({ name: "warning" });
+          } else if (piniaStorage.getAdmin && !isMobile.value) {
+            router.push({ name: "cmshome" });
+          } else if (!piniaStorage.getAdmin && isMobile.value) {
+            router.push({ name: "tickets" });
+          }
+        } catch (error) {
+          console.error("Login failed:", error);
+          showError.value = true;
+        } finally {
+          isLoading.value = false;
+        }
+      };
+
+      return {
+        isMobile,
+        email,
+        password,
+        visible,
+        isLoading,
+        rules,
+        login,
+        showError,
+        showEmpty,
+      };
+    },
+  };
 </script>
 
 <style scoped>
-.center-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+  .center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
 
-.no-underline {
-  text-decoration: none;
-}
+  .no-underline {
+    text-decoration: none;
+  }
 </style>
